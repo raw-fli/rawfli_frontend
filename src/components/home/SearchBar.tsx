@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { MagnifyingGlassIcon } from "@radix-ui/react-icons";
 import styles from "./HomePage.module.css";
-import { API_BASE_URL } from "@/shared/config/env";
+import { api, ApiError } from "@/lib/api";
 
 type SearchResult = {
   type: "post" | "article";
@@ -76,26 +76,15 @@ export default function SearchBar() {
     setMessage(null);
 
     try {
-      const res = await fetch(
-        `${API_BASE_URL}/api/v1/boards/search?keyword=${encodeURIComponent(trimmed)}&limit=5`,
-        { method: "GET" }
+      const data = await api.get<SearchResponse>(
+        `/api/v1/boards/search?keyword=${encodeURIComponent(trimmed)}&limit=5`
       );
-      const json = await res.json();
-
-      if (!json.result) {
-        setResults([]);
-        setMessage(typeof json.data === "string" ? json.data : "검색에 실패했습니다.");
-        setOpen(true);
-        return;
-      }
-
-      const data = json.data as SearchResponse;
       setResults(data.results || []);
       setMessage(data.results.length === 0 ? "검색 결과가 없습니다." : null);
       setOpen(true);
-    } catch {
+    } catch (error) {
       setResults([]);
-      setMessage("검색 중 문제가 발생했습니다.");
+      setMessage(error instanceof ApiError ? error.message : "검색 중 문제가 발생했습니다.");
       setOpen(true);
     } finally {
       setLoading(false);

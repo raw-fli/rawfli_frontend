@@ -4,41 +4,20 @@ import Sidebar from "@/components/home/Sidebar";
 import CommunitySection from "@/components/home/CommunitySection";
 import HomeFooter from "@/components/home/HomeFooter";
 import styles from "@/components/home/HomePage.module.css";
-import { API_BASE_URL } from "@/shared/config/env";
-
-type ApiResponse<T> = {
-  result: boolean;
-  code: number;
-  data: T | string;
-};
+import { fetchPublicApi } from "@/lib/publicApi";
 
 type BoardFeed = {
   board: Board;
   articles?: ArticleListResponse["articles"];
 };
 
-type ArticlePreviewDetail = {
+type ArticlePreviewSummary = {
   content?: string;
   thumbnailKey?: string;
 };
 
-async function fetchApi<T>(path: string): Promise<T | null> {
-  try {
-    const res = await fetch(`${API_BASE_URL}${path}`, { cache: "no-store" });
-    const json = (await res.json()) as ApiResponse<T>;
-
-    if (!json.result) {
-      return null;
-    }
-
-    return json.data as T;
-  } catch {
-    return null;
-  }
-}
-
 async function loadBoardFeeds(): Promise<BoardFeed[]> {
-  const boards = (await fetchApi<Board[]>("/api/v1/boards")) ?? [];
+  const boards = (await fetchPublicApi<Board[]>("/api/v1/boards", { revalidate: 30 })) ?? [];
 
   const feeds = await Promise.all(
     boards.map(async (board) => {
@@ -46,7 +25,7 @@ async function loadBoardFeeds(): Promise<BoardFeed[]> {
         return { board };
       }
 
-      const data = await fetchApi<ArticleListResponse>(
+      const data = await fetchPublicApi<ArticleListResponse>(
         `/api/v1/boards/${board.id}/articles?page=1&limit=6`
       );
 
@@ -62,7 +41,7 @@ async function loadBoardFeeds(): Promise<BoardFeed[]> {
         return { board, articles };
       }
 
-      const detail = await fetchApi<ArticlePreviewDetail>(
+      const detail = await fetchPublicApi<ArticlePreviewSummary>(
         `/api/v1/boards/${board.id}/articles/${featured.id}`
       );
 

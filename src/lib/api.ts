@@ -1,6 +1,7 @@
 import { API_BASE_URL } from "@/shared/config/env";
+import { getToken } from "@/lib/auth";
 
-interface ApiResponse<T> {
+export interface ApiResponse<T> {
   result: boolean;
   code: number;
   data: T | string;
@@ -14,11 +15,6 @@ class ApiError extends Error {
     this.name = "ApiError";
     this.code = code;
   }
-}
-
-function getToken(): string | null {
-  if (typeof window === "undefined") return null;
-  return localStorage.getItem("token");
 }
 
 async function request<T>(

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ChatBubbleIcon, EyeOpenIcon, HeartIcon, ImageIcon, PersonIcon } from "@radix-ui/react-icons";
 import type { ArticleListItem, Board } from "@/lib/types";
-import { S3_IMAGE_BASE_URL } from "@/shared/config/env";
+import { toS3ImageUrl } from "@/shared/utils/image";
 import { formatRelativeTime } from "@/shared/utils/time";
 import styles from "./HomePage.module.css";
 
@@ -13,9 +13,7 @@ type CommunitySectionProps = {
 
 export default function CommunitySection({ board, articles, index }: CommunitySectionProps) {
   const [featured, ...rest] = articles;
-  const thumbnailUrl = featured?.thumbnailKey
-    ? `${S3_IMAGE_BASE_URL}/${encodeURI(featured.thumbnailKey)}`
-    : undefined;
+  const thumbnailUrl = toS3ImageUrl(featured?.thumbnailKey);
 
   return (
     <section id={`board-${board.id}`} className={styles.sectionCard} style={{ animationDelay: `${index * 0.1}s` }}>
@@ -31,7 +29,7 @@ export default function CommunitySection({ board, articles, index }: CommunitySe
       <div className={styles.sectionBody}>
         {featured && (
           <div className={styles.featuredRow}>
-            <div className={styles.featuredCard}>
+            <Link href={`/boards/${board.id}/articles/${featured.id}`} className={styles.featuredCard}>
               <div
                 className={styles.featuredMedia}
                 style={
@@ -70,11 +68,11 @@ export default function CommunitySection({ board, articles, index }: CommunitySe
                   <span className={styles.metaTime}>{formatRelativeTime(featured.createdAt)}</span>
                 </div>
               </div>
-            </div>
+            </Link>
           </div>
         )}
 
-        {rest.slice(0, 4).map((item, itemIndex) => (
+        {rest.slice(0, 4).map((item) => (
           <Link key={item.id} href={`/boards/${board.id}/articles/${item.id}`} className={styles.listRow}>
             <span className={styles.listIndex}>{item.id}</span>
             <span className={styles.listTitleWrap}>
@@ -84,12 +82,15 @@ export default function CommunitySection({ board, articles, index }: CommunitySe
                 <ChatBubbleIcon className={styles.listFallbackIcon} aria-label="이미지 없음" />
               )}
               <span className={styles.listTitle}>{item.title}</span>
+              {item.commentCount > 0 && (
+                <span className={styles.listCommentCount}>[{item.commentCount}]</span>
+              )}
             </span>
             <span className={styles.listCommentMeta}>
               <span>{item.author.username}</span>
               <span className={styles.metaDivider}>·</span>
-              <ChatBubbleIcon className={styles.listCommentIcon} />
-              {item.commentCount}
+              <HeartIcon className={styles.listCommentIcon} />
+              {item.likesCount ?? 0}
             </span>
           </Link>
         ))}
