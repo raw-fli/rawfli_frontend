@@ -1,0 +1,28 @@
+.theme {
+  min-height: 100vh;
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  color-scheme: dark;
+
+  /* Background Colors */
+  --bg-main: #121212;
+  --bg-card: #1e1e1e;
+  --bg-overlay: rgba(0, 0, 0, 0.85);
+
+  /* Brand Colors */
+  --color-accent: #32ff00; /* Neon Green */
+  --color-accent-hover: #29cc00;
+  --color-hot: #ff4d4d;
+
+  /* Text Colors */
+  --text-primary: #ffffff;
+  --text-secondary: #a0a0a0;
+  --text-muted: #666666;
+  --text-on-accent: #121212;
+
+  /* UI Elements */
+  --border-color: #2a2a2a;
+  --input-bg: #252525;
+  --input-border: #333333;
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.5);
+}

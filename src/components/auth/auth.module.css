@@ -1,0 +1,90 @@
+.page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--bg-main) 0%, var(--bg-card) 100%);
+}
+
+.card {
+  border: 1px solid var(--border-color);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  background-color: var(--bg-card);
+}
+
+.heading {
+  color: var(--text-primary);
+}
+
+.subtitle {
+  color: var(--text-secondary);
+}
+
+.label {
+  color: var(--text-primary);
+}
+
+.inputRoot {
+  background-color: var(--input-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  min-height: 44px;
+}
+
+.inputRoot:focus-within {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 1px var(--color-accent);
+}
+
+.inputRoot :global(input) {
+  color: var(--text-primary);
+}
+
+.inputRoot :global(input::placeholder) {
+  color: var(--text-muted);
+}
+
+.btnPrimary {
+  background-color: var(--color-accent);
+  color: var(--text-on-accent);
+  border-radius: 6px;
+  min-height: 40px;
+}
+
+.btnPrimary:hover {
+  background-color: var(--color-accent-hover);
+}
+
+.btnPrimary:disabled {
+  opacity: 0.7;
+}
+
+.btnSecondary {
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  min-height: 40px;
+}
+
+.btnSecondary:hover {
+  background-color: var(--input-bg);
+}
+
+.calloutSuccess {
+  background-color: rgba(50, 255, 0, 0.08);
+  border: 1px solid rgba(50, 255, 0, 0.4);
+  color: var(--text-primary);
+}
+
+.calloutError {
+  background-color: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+.link {
+  color: var(--text-secondary);
+}
+
+.link :global(a) {
+  color: var(--color-accent);
+  font-weight: 600;
+}
