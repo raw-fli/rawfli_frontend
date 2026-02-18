@@ -1,0 +1,127 @@
+.commentCard {
+  border-radius: 20px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-card);
+  padding: 28px;
+}
+
+.commentHead {
+  margin: 0;
+  font-size: 19px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.commentHeadCount {
+  color: var(--color-accent);
+}
+
+.commentList {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.commentItem {
+  border-radius: 12px;
+  border: 1px solid transparent;
+  background-color: color-mix(in oklab, var(--input-bg), transparent 35%);
+  padding: 14px 16px;
+  transition: border-color 0.2s ease;
+}
+
+.commentItem:hover {
+  border-color: var(--border-color);
+}
+
+.replyItem {
+  background-color: color-mix(in oklab, var(--input-bg), transparent 55%);
+  border-left: 2px solid var(--color-accent);
+  border-radius: 0 12px 12px 0;
+}
+
+.replyIndicator {
+  color: var(--color-accent);
+  font-weight: 700;
+  margin-right: 2px;
+}
+
+.commentMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.commentAuthor {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.commentTime {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.commentText {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.emptyComment {
+  margin-top: 16px;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px dashed var(--border-color);
+  color: var(--text-secondary);
+  text-align: center;
+  font-size: 14px;
+}
+
+.commentWrite {
+  margin-top: 16px;
+  position: relative;
+}
+
+.commentInput {
+  width: 100%;
+  min-height: 110px;
+  border-radius: 14px;
+  border: 1px solid var(--border-color);
+  background-color: var(--input-bg);
+  color: var(--text-primary);
+  font-size: 14px;
+  line-height: 1.5;
+  resize: vertical;
+  padding: 14px 14px 48px;
+  box-sizing: border-box;
+}
+
+.commentInput:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.commentButton {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  height: 34px;
+  border-radius: 10px;
+  border: none;
+  padding: 0 16px;
+  font-weight: 700;
+  background-color: var(--color-accent);
+  color: var(--text-on-accent);
+}
+
+@media (max-width: 768px) {
+  .commentCard {
+    padding: 20px;
+  }
+}

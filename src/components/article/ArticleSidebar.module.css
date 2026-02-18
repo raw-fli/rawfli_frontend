@@ -1,0 +1,86 @@
+.sideCol {
+  display: grid;
+  gap: 16px;
+  align-content: start;
+}
+
+.sideCard {
+  border-radius: 18px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-card);
+  padding: 16px;
+}
+
+.sideTitle {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.trendingList {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.trendingItem {
+  border-top: 1px solid var(--border-color);
+  padding-top: 10px;
+}
+
+.trendingItem:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+.trendingCategory {
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.trendingTitle {
+  margin-top: 4px;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.trendingLink {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.trendingEmpty {
+  margin: 12px 0 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.statusGrid {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.statusBox {
+  text-align: center;
+}
+
+.statusNumber {
+  font-size: 21px;
+  font-weight: 700;
+}
+
+.statusLabel {
+  margin-top: 4px;
+  color: var(--text-muted);
+  font-size: 11px;
+}

@@ -1,0 +1,40 @@
+.page {
+  min-height: 100vh;
+  background:
+    radial-gradient(1200px 420px at 15% -10%, rgba(50, 255, 0, 0.12), transparent 60%),
+    radial-gradient(900px 360px at 85% 5%, rgba(50, 255, 0, 0.06), transparent 60%),
+    var(--bg-main);
+  color: var(--text-primary);
+}
+
+.main {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 32px 24px 64px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+.articleCard {
+  border-radius: 20px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-card);
+  overflow: hidden;
+}
+
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: minmax(0, 3fr) minmax(280px, 1fr);
+    gap: 28px;
+  }
+}
+
+@media (max-width: 768px) {
+  .main {
+    padding: 20px 16px 48px;
+  }
+}

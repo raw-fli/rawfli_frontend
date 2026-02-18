@@ -1,0 +1,53 @@
+.articleHead {
+  padding: 28px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.boardLabel {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-accent);
+  margin-bottom: 10px;
+  display: block;
+}
+
+.title {
+  margin: 0;
+  font-size: 32px;
+  line-height: 1.28;
+  letter-spacing: -0.02em;
+}
+
+.metaRow {
+  margin-top: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.metaStrong {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.metaDivider {
+  color: var(--text-muted);
+}
+
+.likeCount {
+  color: var(--color-accent);
+  font-weight: 700;
+}
+
+@media (max-width: 768px) {
+  .articleHead {
+    padding: 20px;
+  }
+
+  .title {
+    font-size: 25px;
+  }
+}
