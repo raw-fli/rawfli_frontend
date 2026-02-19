@@ -31,7 +31,7 @@ export default async function ArticleDetailPage({
   const [article, board, trendingData] = await Promise.all([
     fetchPublicApi<ArticleResponse>(`/api/v1/boards/${parsedBoardId}/articles/${parsedArticleId}`),
     fetchPublicApi<Board>(`/api/v1/boards/${parsedBoardId}`),
-    fetchPublicApi<ArticleListResponse>(`/api/v1/boards/${parsedBoardId}/articles?page=1&limit=4`),
+    fetchPublicApi<ArticleListResponse>(`/api/v1/boards/${parsedBoardId}/articles/popular?limit=4`),
   ]);
 
   if (!article) {

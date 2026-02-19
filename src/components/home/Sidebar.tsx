@@ -8,7 +8,7 @@ type SidebarProps = {
 };
 
 export default function Sidebar({ boards }: SidebarProps) {
-  const popularBoards = boards.slice(0, 4);
+  const boardsList = boards.slice(0, 4);
 
   return (
     <aside className={styles.sidebar}>
@@ -18,13 +18,13 @@ export default function Sidebar({ boards }: SidebarProps) {
 
       <div className={`${styles.sidebarCard} ${styles.sidebarPopularCard}`}>
         <h3 className={styles.sidebarTitle}>
-          <LightningBoltIcon /> 인기 게시판
+          <LightningBoltIcon /> 게시판 목록
         </h3>
         <div className={styles.sidebarList}>
-          {popularBoards.map((board, index) => (
+          {boardsList.map((board, index) => (
             <Link
               key={board.id}
-              href={`#board-${board.id}`}
+              href={``}
               className={`${styles.sidebarItem} ${index === 0 ? styles.sidebarItemActive : ""}`}
             >
               <span>{board.name}</span>
@@ -33,7 +33,8 @@ export default function Sidebar({ boards }: SidebarProps) {
           ))}
         </div>
       </div>
-
+        
+      {/* TODO: fix stats data */}
       <div className={`${styles.sidebarCard} ${styles.sidebarStatsCard}`}>
         <span className={styles.sidebarTitle}>커뮤니티 현황</span>
         <div className={styles.statsGrid}>
