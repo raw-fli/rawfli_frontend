@@ -19,26 +19,49 @@ type ArticlePreviewSummary = {
 async function loadBoardFeeds(): Promise<BoardFeed[]> {
   const boards = (await fetchPublicApi<Board[]>("/api/v1/boards", { revalidate: 30 })) ?? [];
 
+  const getArticles = (
+    data: ArticleListResponse | ArticleListResponse["articles"] | null
+  ): ArticleListResponse["articles"] => {
+    if (!data) {
+      return [];
+    }
+
+    if (Array.isArray(data)) {
+      return data;
+    }
+
+    return data.articles ?? [];
+  };
+
   const feeds = await Promise.all(
     boards.map(async (board) => {
       if (board.type === "gallery") {
         return { board };
       }
 
-      const data = await fetchPublicApi<ArticleListResponse>(
+      const latestData = await fetchPublicApi<ArticleListResponse>(
         `/api/v1/boards/${board.id}/articles?page=1&limit=6`
       );
+      const popularData = await fetchPublicApi<ArticleListResponse | ArticleListResponse["articles"]>(
+        `/api/v1/boards/${board.id}/articles/popular`
+      );
 
-      const articles = data?.articles ?? [];
-      const featured = articles[0];
+      const latestArticles = getArticles(latestData);
+      const popularArticles = getArticles(popularData);
+      const featured = popularArticles[0];
 
       if (!featured) {
-        return { board, articles };
+        return { board, articles: latestArticles };
       }
 
       const needsDetail = !featured.content || !featured.thumbnailKey;
+      const latestWithoutFeatured = latestArticles.filter((article) => article.id !== featured.id);
+
       if (!needsDetail) {
-        return { board, articles };
+        return {
+          board,
+          articles: [featured, ...latestWithoutFeatured],
+        };
       }
 
       const detail = await fetchPublicApi<ArticlePreviewSummary>(
@@ -53,7 +76,7 @@ async function loadBoardFeeds(): Promise<BoardFeed[]> {
 
       return {
         board,
-        articles: [mergedFeatured, ...articles.slice(1)],
+        articles: [mergedFeatured, ...latestWithoutFeatured],
       };
     })
   );
