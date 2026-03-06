@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import AppTheme from "@/components/theme/AppTheme";
+import QueryProvider from "@/components/providers/QueryProvider";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import { configureApiClient } from "@rawfli/types";
 
@@ -24,7 +25,9 @@ export default function RootLayout({
     <html lang="ko" suppressHydrationWarning>
       <body className={plusJakarta.className}>
         <AppTheme>
-          {children}
+          <QueryProvider>
+            {children}
+          </QueryProvider>
         </AppTheme>
       </body>
     </html>
