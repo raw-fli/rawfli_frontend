@@ -92,7 +92,7 @@ export default function AuthModal({
 
     try {
       const token = await authApi.login({ email: email.trim(), password: loginPassword });
-      saveToken(token);
+      saveToken(token.data.token);
       onAuthSuccess?.();
       onClose();
     } catch (error) {
