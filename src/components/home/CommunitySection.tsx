@@ -1,19 +1,19 @@
 import Link from "next/link";
 import { ChatBubbleIcon, EyeOpenIcon, HeartIcon, ImageIcon, PersonIcon } from "@radix-ui/react-icons";
-import type { ArticleListItem, Board } from "@/lib/types";
 import { toS3ImageUrl } from "@/shared/utils/image";
 import { formatRelativeTime } from "@/shared/utils/time";
 import styles from "./HomePage.module.css";
+import { ArticleListItemResponseDto, BoardResponseDto } from "@rawfli/types";
 
 type CommunitySectionProps = {
-  board: Board;
-  articles: ArticleListItem[];
+  board: BoardResponseDto;
+  articles: ArticleListItemResponseDto[];
   index: number;
 };
 
 export default function CommunitySection({ board, articles, index }: CommunitySectionProps) {
   const [featured, ...rest] = articles;
-  const thumbnailUrl = toS3ImageUrl(featured?.thumbnailKey);
+  const thumbnailUrl = toS3ImageUrl(featured.thumbnailKey ?? "");
 
   return (
     <section id={`board-${board.id}`} className={styles.sectionCard} style={{ animationDelay: `${index * 0.1}s` }}>

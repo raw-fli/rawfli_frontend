@@ -1,27 +1,21 @@
-import type { ArticleListResponse, Board } from "@/lib/types";
 import HomeHeader from "@/components/home/HomeHeader";
 import Sidebar from "@/components/home/Sidebar";
 import CommunitySection from "@/components/home/CommunitySection";
 import HomeFooter from "@/components/home/HomeFooter";
 import styles from "@/components/home/HomePage.module.css";
-import { fetchPublicApi } from "@/lib/publicApi";
+import { articleControllerGetArticle, articleControllerGetArticles, articleControllerGetPopularArticles, ArticleListItemResponseDto, ArticleListResponseDto, BoardResponseDto, boardsControllerGetBoards } from "@rawfli/types";
 
 type BoardFeed = {
-  board: Board;
-  articles?: ArticleListResponse["articles"];
-};
-
-type ArticlePreviewSummary = {
-  content?: string;
-  thumbnailKey?: string;
+  board: BoardResponseDto;
+  articles?: ArticleListResponseDto["articles"] | ArticleListItemResponseDto[];
 };
 
 async function loadBoardFeeds(): Promise<BoardFeed[]> {
-  const boards = (await fetchPublicApi<Board[]>("/api/v1/boards", { revalidate: 30 })) ?? [];
+  const boardsResponse = await boardsControllerGetBoards();
+  const boards = boardsResponse?.data ?? [];
 
   const getArticles = (
-    data: ArticleListResponse | ArticleListResponse["articles"] | null
-  ): ArticleListResponse["articles"] => {
+    data: ArticleListResponseDto): ArticleListResponseDto["articles"] => {
     if (!data) {
       return [];
     }
@@ -39,22 +33,18 @@ async function loadBoardFeeds(): Promise<BoardFeed[]> {
         return { board };
       }
 
-      const latestData = await fetchPublicApi<ArticleListResponse>(
-        `/api/v1/boards/${board.id}/articles?page=1&limit=6`
-      );
-      const popularData = await fetchPublicApi<ArticleListResponse | ArticleListResponse["articles"]>(
-        `/api/v1/boards/${board.id}/articles/popular`
-      );
+      const latestData = await articleControllerGetArticles(board.id, { page: 1, limit: 6 });
+      const popularData = await articleControllerGetPopularArticles(board.id, { page: 1, limit: 6 });
 
-      const latestArticles = getArticles(latestData);
-      const popularArticles = getArticles(popularData);
+      const latestArticles = getArticles(latestData?.data)
+      const popularArticles = getArticles(popularData?.data)
       const featured = popularArticles[0];
 
       if (!featured) {
         return { board, articles: latestArticles };
       }
 
-      const needsDetail = !featured.content || !featured.thumbnailKey;
+      const needsDetail = !featured.thumbnailKey;
       const latestWithoutFeatured = latestArticles.filter((article) => article.id !== featured.id);
 
       if (!needsDetail) {
@@ -64,14 +54,13 @@ async function loadBoardFeeds(): Promise<BoardFeed[]> {
         };
       }
 
-      const detail = await fetchPublicApi<ArticlePreviewSummary>(
-        `/api/v1/boards/${board.id}/articles/${featured.id}`
-      );
+      const detailResponse = await articleControllerGetArticle(board.id, featured.id);
+      const detail = detailResponse?.data;
 
       const mergedFeatured = {
         ...featured,
-        content: detail?.content ?? featured.content,
-        thumbnailKey: detail?.thumbnailKey ?? featured.thumbnailKey,
+        content: detail?.content,
+        thumbnailKey: featured.thumbnailKey,
       };
 
       return {
