@@ -1,12 +1,11 @@
-import { api } from "./api";
-import type { SignupRequest, SignupResponse, LoginRequest, LoginResponse } from "./types";
+import { authControllerLogin, authControllerSignUp, CreateUserDto, LoginUserDto } from "@rawfli/types";
 
 export const authApi = {
-  signup: (data: SignupRequest) =>
-    api.post<SignupResponse>("/api/v1/auth/signup", data),
+  signup: (data: CreateUserDto) =>
+    authControllerSignUp(data),
 
-  login: (data: LoginRequest) =>
-    api.post<LoginResponse>("/api/v1/auth/login", data),
+  login: (data: LoginUserDto) =>
+    authControllerLogin(data),
 };
 
 export function saveToken(token: string) {

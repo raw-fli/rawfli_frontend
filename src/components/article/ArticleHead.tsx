@@ -1,8 +1,8 @@
-import type { ArticleResponse } from "@/lib/types";
+import { ArticleResponseDto } from "@rawfli/types";
 import styles from "./ArticleHead.module.css";
 
 type ArticleHeadProps = {
-  article: ArticleResponse;
+  article: ArticleResponseDto;
   boardName: string;
   formattedDate: string;
 };

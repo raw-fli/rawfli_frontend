@@ -4,34 +4,13 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { MagnifyingGlassIcon } from "@radix-ui/react-icons";
 import styles from "./HomePage.module.css";
-import { api, ApiError } from "@/lib/api";
-
-type SearchResult = {
-  type: "post" | "article";
-  id: number;
-  boardId: number;
-  boardName: string;
-  title: string;
-  content: string;
-  author: {
-    id: number;
-    username: string;
-  };
-  views: number;
-  likesCount: number;
-  commentCount: number;
-  createdAt: string;
-};
-
-type SearchResponse = {
-  results: SearchResult[];
-  total: number;
-};
+import { ApiError } from "@/lib/api";
+import { boardsControllerSearchInAllBoards, SearchResultItemResponseDto } from "@rawfli/types";
 
 export default function SearchBar() {
   const containerRef = useRef<HTMLFormElement>(null);
   const [keyword, setKeyword] = useState("");
-  const [results, setResults] = useState<SearchResult[]>([]);
+  const [results, setResults] = useState<SearchResultItemResponseDto[]>([]);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -76,11 +55,9 @@ export default function SearchBar() {
     setMessage(null);
 
     try {
-      const data = await api.get<SearchResponse>(
-        `/api/v1/boards/search?keyword=${encodeURIComponent(trimmed)}&limit=5`
-      );
-      setResults(data.results || []);
-      setMessage(data.results.length === 0 ? "검색 결과가 없습니다." : null);
+      const searchResponse = await boardsControllerSearchInAllBoards({ keyword: trimmed, searchIn: "both", limit: 5 });
+      setResults(searchResponse.data.results || []);
+      setMessage(searchResponse.data.results.length === 0 ? "검색 결과가 없습니다." : null);
       setOpen(true);
     } catch (error) {
       setResults([]);
@@ -91,7 +68,7 @@ export default function SearchBar() {
     }
   };
 
-  const getDetailLink = (result: SearchResult) =>
+  const getDetailLink = (result: SearchResultItemResponseDto) =>
     result.type === "post"
       ? `/boards/${result.boardId}/posts/${result.id}`
       : `/boards/${result.boardId}/articles/${result.id}`;

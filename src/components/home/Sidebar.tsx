@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { Pencil2Icon, LightningBoltIcon } from "@radix-ui/react-icons";
-import type { Board } from "@/lib/types";
 import styles from "./HomePage.module.css";
+import { BoardResponseDto } from "@rawfli/types";
 
 type SidebarProps = {
-  boards: Board[];
+  boards: BoardResponseDto[];
 };
 
 export default function Sidebar({ boards }: SidebarProps) {
@@ -31,21 +31,6 @@ export default function Sidebar({ boards }: SidebarProps) {
               {index === 0 && <span className={styles.hotBadge}>HOT</span>}
             </Link>
           ))}
-        </div>
-      </div>
-        
-      {/* TODO: fix stats data */}
-      <div className={`${styles.sidebarCard} ${styles.sidebarStatsCard}`}>
-        <span className={styles.sidebarTitle}>커뮤니티 현황</span>
-        <div className={styles.statsGrid}>
-          <div className={styles.statItem}>
-            <div className={styles.statValue}>1,240</div>
-            <div className={styles.statLabel}>오늘의 게시글</div>
-          </div>
-          <div className={styles.statItem}>
-            <div className={styles.statValue}>850</div>
-            <div className={styles.statLabel}>접속 멤버</div>
-          </div>
         </div>
       </div>
     </aside>

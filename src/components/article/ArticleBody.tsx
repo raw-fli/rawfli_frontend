@@ -1,14 +1,14 @@
 "use client";
 
-import type { ArticleResponse } from "@/lib/types";
 import Image from "next/image";
 import { useState } from "react";
-import { api, ApiError } from "@/lib/api";
+import { ApiError } from "@/lib/api";
 import { isLoggedIn } from "@/lib/auth";
 import styles from "./ArticleBody.module.css";
+import { articleControllerToggleLike, ArticleResponseDto } from "@rawfli/types";
 
 type ArticleBodyProps = {
-  article: ArticleResponse;
+  article: ArticleResponseDto;
   heroImageUrl?: string | null;
   boardId: number;
   articleId: number;
@@ -27,7 +27,7 @@ export default function ArticleBody({ article, heroImageUrl, boardId, articleId 
     if (loading) return;
     setLoading(true);
     try {
-      await api.post(`/api/v1/boards/${boardId}/articles/${articleId}/like`);
+      await articleControllerToggleLike(boardId, articleId);
       setLiked((prev) => !prev);
       setLikesCount((prev) => liked ? prev - 1 : prev + 1);
     } catch (error) {

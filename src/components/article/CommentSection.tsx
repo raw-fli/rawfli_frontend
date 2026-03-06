@@ -1,26 +1,26 @@
 "use client";
 
-import type { CommentResponse } from "@/lib/types";
 import { useState } from "react";
 import { formatRelativeTime } from "@/shared/utils/time";
-import { api, ApiError } from "@/lib/api";
+import { ApiError } from "@/lib/api";
 import { isLoggedIn } from "@/lib/auth";
 import styles from "./CommentSection.module.css";
+import { articleControllerCreateComment, CommentResponseDto } from "@rawfli/types";
 
 type CommentSectionProps = {
-  comments: CommentResponse[];
+  comments: CommentResponseDto[];
   boardId: number;
   articleId: number;
 };
 
-function countAllComments(comments: CommentResponse[]): number {
+function countAllComments(comments: CommentResponseDto[]): number {
   return comments.reduce(
     (sum, comment) => sum + 1 + countAllComments(comment.replies ?? []),
     0
   );
 }
 
-function CommentItem({ comment, depth = 0, parentAuthor }: { comment: CommentResponse; depth?: number; parentAuthor?: string }) {
+function CommentItem({ comment, depth = 0, parentAuthor }: { comment: CommentResponseDto; depth?: number; parentAuthor?: string }) {
   const replies = comment.replies ?? [];
 
   return (
@@ -48,7 +48,7 @@ function CommentItem({ comment, depth = 0, parentAuthor }: { comment: CommentRes
 }
 
 export default function CommentSection({ comments: initialComments, boardId, articleId }: CommentSectionProps) {
-  const [comments, setComments] = useState<CommentResponse[]>(initialComments);
+  const [comments, setComments] = useState<CommentResponseDto[]>(initialComments);
   const [text, setText] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const totalCount = countAllComments(comments);
@@ -62,10 +62,8 @@ export default function CommentSection({ comments: initialComments, boardId, art
     if (!trimmed) return;
     setSubmitting(true);
     try {
-      const newComment = await api.post<CommentResponse>(
-        `/api/v1/boards/${boardId}/articles/${articleId}/comments`,
-        { content: trimmed }
-      );
+      const newCommentResponse = await articleControllerCreateComment(boardId, articleId, { content: trimmed });
+      const newComment = newCommentResponse.data;
       setComments((prev) => [...prev, newComment]);
       setText("");
     } catch (error) {

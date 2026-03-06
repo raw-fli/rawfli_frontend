@@ -1,4 +1,3 @@
-import type { ArticleListResponse, ArticleResponse, Board } from "@/lib/types";
 import { notFound } from "next/navigation";
 import HomeFooter from "@/components/home/HomeFooter";
 import HomeHeader from "@/components/home/HomeHeader";
@@ -6,9 +5,9 @@ import ArticleHead from "@/components/article/ArticleHead";
 import ArticleBody from "@/components/article/ArticleBody";
 import CommentSection from "@/components/article/CommentSection";
 import ArticleSidebar from "@/components/article/ArticleSidebar";
-import { fetchPublicApi } from "@/lib/publicApi";
 import { toS3ImageUrl } from "@/shared/utils/image";
 import styles from "./page.module.css";
+import { articleControllerGetArticle, articleControllerGetPopularArticles, ArticleListResponseDto, ArticleResponseDto, BoardResponseDto, boardsControllerGetBoard } from "@rawfli/types";
 
 type RouteParams = {
   boardId: string;
@@ -28,17 +27,20 @@ export default async function ArticleDetailPage({
     notFound();
   }
 
-  const [article, board, trendingData] = await Promise.all([
-    fetchPublicApi<ArticleResponse>(`/api/v1/boards/${parsedBoardId}/articles/${parsedArticleId}`),
-    fetchPublicApi<Board>(`/api/v1/boards/${parsedBoardId}`),
-    fetchPublicApi<ArticleListResponse>(`/api/v1/boards/${parsedBoardId}/articles/popular?limit=4`),
+  const [articleResp, boardResp, trendingDataResp] = await Promise.all([
+    articleControllerGetArticle(parsedBoardId, parsedArticleId),
+    boardsControllerGetBoard(parsedBoardId),
+    articleControllerGetPopularArticles(parsedBoardId, { limit: 4 }),
   ]);
 
-  if (!article) {
+  if (!articleResp) {
     notFound();
   }
+  const article = articleResp.data;
+  const board = boardResp.data;
+  const trendingData = trendingDataResp.data;
 
-  const boardName = board?.name ?? "커뮤니티";
+  const boardName = board.name ?? "커뮤니티";
 
   const formattedCreatedAt = new Intl.DateTimeFormat("ko-KR", {
     year: "numeric",
