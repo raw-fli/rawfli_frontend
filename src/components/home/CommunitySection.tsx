@@ -46,7 +46,7 @@ export default function CommunitySection({ board, articles, index }: CommunitySe
               <div>
                 <span className={styles.featuredBadge}>BEST</span>
                 <div className={styles.featuredTitle}>{featured.title}</div>
-                <p className={styles.featuredText}>{featured.content?.trim() || "본문이 없습니다."}</p>
+                <p className={styles.featuredText}>{featured.content?.replace(/!\[\]\([^)]*\)/g, "").replace(/[*_`#>~\[\]]/g, "").trim() || "본문이 없습니다."}</p>
                 <div className={styles.metaRow}>
                   <span className={styles.metaInline}>
                     <span className={`${styles.metaIconItem} ${styles.metaLikeItem}`}>

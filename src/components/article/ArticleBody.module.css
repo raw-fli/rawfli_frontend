@@ -10,8 +10,16 @@
   white-space: pre-wrap;
 }
 
-.imageWrap {
+.imageList {
   margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.imageWrap {
+  display: block;
+  /* kept for individual image wrapper */
 }
 
 .image {

@@ -128,6 +128,11 @@
   color: var(--text-primary);
 }
 
+.toolbarButtonActive {
+  background: var(--input-bg);
+  color: var(--color-accent) !important;
+}
+
 .toolbarButton svg {
   width: 18px;
   height: 18px;
@@ -155,6 +160,14 @@
 
 .contentTextarea::placeholder {
   color: var(--text-muted);
+}
+
+.contentPreview {
+  min-height: 400px;
+  padding: 24px;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  line-height: 1.7;
 }
 
 /* ── Image Upload ── */
@@ -242,6 +255,18 @@
   border-radius: 10px;
   overflow: hidden;
   border: 1px solid var(--border-color);
+}
+
+.uploadingOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  color: #fff;
+  font-weight: 600;
 }
 
 .imagePreviewItem img {

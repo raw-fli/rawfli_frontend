@@ -64,9 +64,10 @@ export default async function ArticleDetailPage({
 
   const todayPosts = trendingData?.total ?? 0;
 
-  const heroImageKey =
-    article?.referencedPhotos?.[0]?.imageKey ?? article?.attachedImages?.[0]?.key;
-  const heroImageUrl = toS3ImageUrl(heroImageKey);
+  const imageUrls = [
+    ...article.referencedPhotos.map((p) => toS3ImageUrl(p.imageKey)),
+    ...article.attachedImages.map((img) => toS3ImageUrl(img.key)),
+  ];
 
   return (
     <div className={styles.page}>
@@ -81,7 +82,7 @@ export default async function ArticleDetailPage({
                 boardName={boardName}
                 formattedDate={formattedCreatedAt}
               />
-              <ArticleBody article={article} heroImageUrl={heroImageUrl} boardId={parsedBoardId} articleId={parsedArticleId} />
+              <ArticleBody article={article} imageUrls={imageUrls} boardId={parsedBoardId} articleId={parsedArticleId} />
             </article>
 
             <CommentSection comments={article.comments} boardId={parsedBoardId} articleId={parsedArticleId} />

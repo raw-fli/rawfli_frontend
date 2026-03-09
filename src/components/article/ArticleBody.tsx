@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import ReactMarkdown from "react-markdown";
 import { ApiError } from "@/lib/api";
 import { isLoggedIn } from "@/lib/auth";
 import styles from "./ArticleBody.module.css";
@@ -9,15 +10,21 @@ import { articleControllerToggleLike, ArticleResponseDto } from "@rawfli/types";
 
 type ArticleBodyProps = {
   article: ArticleResponseDto;
-  heroImageUrl?: string | null;
+  imageUrls: (string | undefined)[];
   boardId: number;
   articleId: number;
 };
 
-export default function ArticleBody({ article, heroImageUrl, boardId, articleId }: ArticleBodyProps) {
+export default function ArticleBody({ article, imageUrls, boardId, articleId }: ArticleBodyProps) {
   const [likesCount, setLikesCount] = useState(article.likesCount);
   const [liked, setLiked] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const imageIdMap = Object.fromEntries(
+    article.attachedImages.map((img) => [img.id, imageUrls.find((u) => u?.includes(img.key))])
+  );
+
+  const hasInlineImages = /!\[\]\([^)]+\)/.test(article.content);
 
   const handleLike = async () => {
     if (!isLoggedIn()) {
@@ -39,20 +46,53 @@ export default function ArticleBody({ article, heroImageUrl, boardId, articleId 
 
   return (
     <div className={styles.articleBody}>
-      <p className={styles.content}>{article.content}</p>
-
-      {heroImageUrl && (
-        <div className={styles.imageWrap}>
-          <Image
-            className={styles.image}
-            src={heroImageUrl}
-            alt={article.title}
-            width={1200}
-            height={800}
-            sizes="(max-width: 1024px) 100vw, 75vw"
-            priority
-          />
+      {hasInlineImages ? (
+        <div className={styles.content}>
+          <ReactMarkdown
+            components={{
+              img: ({ src }: any) => {
+                const url = imageIdMap[src] ?? src;
+                if (!url) return null;
+                return (
+                  <span className={styles.imageWrap}>
+                    <Image
+                      className={styles.image}
+                      src={url}
+                      alt=""
+                      width={1200}
+                      height={800}
+                      sizes="(max-width: 1024px) 100vw, 75vw"
+                    />
+                  </span>
+                );
+              },
+              p: ({ children }) => <p style={{ margin: "0 0 1em" }}>{children}</p>,
+            }}
+          >
+            {article.content}
+          </ReactMarkdown>
         </div>
+      ) : (
+        <>
+          <p className={styles.content}>{article.content}</p>
+
+          {imageUrls.filter(Boolean).length > 0 && (
+            <div className={styles.imageList}>
+              {imageUrls.filter((url): url is string => !!url).map((url) => (
+                <div key={url} className={styles.imageWrap}>
+                  <Image
+                    className={styles.image}
+                    src={url}
+                    alt={article.title}
+                    width={1200}
+                    height={800}
+                    sizes="(max-width: 1024px) 100vw, 75vw"
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+        </>
       )}
 
       <div className={styles.recommendWrap}>
@@ -69,3 +109,4 @@ export default function ArticleBody({ article, heroImageUrl, boardId, articleId 
     </div>
   );
 }
+

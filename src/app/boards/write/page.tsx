@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import ReactMarkdown from "react-markdown";
 import {
   CameraIcon,
   FontBoldIcon,
@@ -11,6 +12,8 @@ import {
   VideoIcon,
   Cross2Icon,
   QuestionMarkCircledIcon,
+  EyeOpenIcon,
+  Pencil2Icon,
 } from "@radix-ui/react-icons";
 import HomeHeader from "@/components/home/HomeHeader";
 import HomeFooter from "@/components/home/HomeFooter";
@@ -35,13 +38,13 @@ export default function ArticleWritePage() {
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [imageFiles, setImageFiles] = useState<File[]>([]);
-  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
-  const [uploadedImageIds, setUploadedImageIds] = useState<(string | null)[]>([]);
-  const [pendingUploads, setPendingUploads] = useState(0);
+  const [editorTab, setEditorTab] = useState<"edit" | "preview">("edit");
+
+  const [imageMap, setImageMap] = useState<Record<string, { file: File; previewUrl: string }>>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const createArticle = useArticleControllerCreateArticle();
 
@@ -56,7 +59,21 @@ export default function ArticleWritePage() {
     });
   }, [router]);
 
-  const handleImageSelect = async (files: FileList | null) => {
+
+  const insertAtCursor = (text: string) => {
+    const ta = textareaRef.current;
+    if (!ta) return;
+    const start = ta.selectionStart;
+    const end = ta.selectionEnd;
+    setContent((prev) => prev.slice(0, start) + text + prev.slice(end));
+
+    requestAnimationFrame(() => {
+      ta.selectionStart = ta.selectionEnd = start + text.length;
+      ta.focus();
+    });
+  };
+
+  const handleImageSelect = (files: FileList | null) => {
     if (!files) return;
 
     const newFiles = Array.from(files).filter((f) =>
@@ -64,38 +81,21 @@ export default function ArticleWritePage() {
     );
     if (!newFiles.length) return;
 
-    const startIndex = imageFiles.length;
+    const tempIds = newFiles.map(() => `img-${Math.random().toString(36).slice(2)}`);
+    const previewUrls = newFiles.map((f) => URL.createObjectURL(f));
 
-    setImageFiles((prev) => [...prev, ...newFiles]);
-    setImagePreviews((prev) => [...prev, ...newFiles.map((f) => URL.createObjectURL(f))]);
-    setUploadedImageIds((prev) => [...prev, ...newFiles.map(() => null)]);
-    setPendingUploads((prev) => prev + 1);
-
-    try {
-      const result = await awsControllerUploadFile({ images: newFiles });
-      const uploaded = (result as unknown as { data: UploadedImage[] }).data;
-      setUploadedImageIds((prev) => {
-        const updated = [...prev];
-        uploaded.forEach((img, i) => {
-          updated[startIndex + i] = img.id;
-        });
-        return updated;
-      });
-    } catch {
-      setSubmitError("이미지 업로드에 실패했습니다. 다시 시도해주세요.");
-      setImageFiles((prev) => prev.filter((_, i) => i < startIndex || i >= startIndex + newFiles.length));
-      setImagePreviews((prev) => prev.filter((_, i) => i < startIndex || i >= startIndex + newFiles.length));
-      setUploadedImageIds((prev) => prev.filter((_, i) => i < startIndex || i >= startIndex + newFiles.length));
-    } finally {
-      setPendingUploads((prev) => prev - 1);
-    }
+    setImageMap((prev) => {
+      const next = { ...prev };
+      tempIds.forEach((id, i) => { next[id] = { file: newFiles[i], previewUrl: previewUrls[i] }; });
+      return next;
+    });
+    insertAtCursor(tempIds.map((id) => `\n![](${id})\n`).join(""));
   };
 
-  const handleRemoveImage = (index: number) => {
-    URL.revokeObjectURL(imagePreviews[index]);
-    setImageFiles((prev) => prev.filter((_, i) => i !== index));
-    setImagePreviews((prev) => prev.filter((_, i) => i !== index));
-    setUploadedImageIds((prev) => prev.filter((_, i) => i !== index));
+  const handleRemoveImage = (id: string) => {
+    URL.revokeObjectURL(imageMap[id]?.previewUrl);
+    setImageMap((prev) => { const next = { ...prev }; delete next[id]; return next; });
+    setContent((prev) => prev.replaceAll(`\n![](${id})\n`, "").replaceAll(`![](${id})`, ""));
   };
 
   const handleDrop = (e: React.DragEvent) => {
@@ -103,14 +103,34 @@ export default function ArticleWritePage() {
     handleImageSelect(e.dataTransfer.files);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!boardId || !title.trim() || !content.trim()) return;
     setSubmitError(null);
 
+    let finalContent = content.trim();
+    const imageIds: string[] = [];
+
+
+    const usedEntries = Object.entries(imageMap).filter(([id]) => finalContent.includes(`![](${id})`));
+
+    if (usedEntries.length > 0) {
+      try {
+        const result = await awsControllerUploadFile({ images: usedEntries.map(([, v]) => v.file) });
+        const uploaded = (result as unknown as { data: UploadedImage[] }).data;
+        uploaded.forEach((img, i) => {
+          finalContent = finalContent.replaceAll(`![](${usedEntries[i][0]})`, `![](${img.id})`);
+          imageIds.push(img.id);
+        });
+      } catch {
+        setSubmitError("이미지 업로드에 실패했습니다. 다시 시도해주세요.");
+        return;
+      }
+    }
+
     const dto: CreateArticleDto = {
       title: title.trim(),
-      content: content.trim(),
-      imageIds: uploadedImageIds.filter((id): id is string => id !== null),
+      content: finalContent,
+      imageIds,
     };
 
     createArticle.mutate(
@@ -127,7 +147,7 @@ export default function ArticleWritePage() {
     );
   };
 
-  const canSubmit = !!title.trim() && !!content.trim() && !createArticle.isPending && pendingUploads === 0;
+  const canSubmit = !!title.trim() && !!content.trim() && !createArticle.isPending;
 
   return (
     <div className={styles.page}>
@@ -175,24 +195,44 @@ export default function ArticleWritePage() {
               onChange={(e) => setTitle(e.target.value)}
             />
 
-            {/* Editor */}
             <div className={styles.editor}>
               <div className={styles.toolbar}>
-                <button type="button" className={styles.toolbarButton} aria-label="굵게">
+                <button type="button" className={styles.toolbarButton} aria-label="굵게"
+                  onClick={() => insertAtCursor("**굵게**")}>
                   <FontBoldIcon />
                 </button>
-                <button type="button" className={styles.toolbarButton} aria-label="기울임">
+                <button type="button" className={styles.toolbarButton} aria-label="기울임"
+                  onClick={() => insertAtCursor("*기울임*")}>
                   <FontItalicIcon />
                 </button>
-                <button type="button" className={styles.toolbarButton} aria-label="링크">
+                <button type="button" className={styles.toolbarButton} aria-label="링크"
+                  onClick={() => insertAtCursor("[링크텍스트](url)")}>
                   <Link2Icon />
                 </button>
                 <div className={styles.toolbarDivider} />
-                <button type="button" className={styles.toolbarButton} aria-label="이미지">
+                <button type="button" className={styles.toolbarButton} aria-label="이미지 추가"
+                  onClick={() => fileInputRef.current?.click()}>
                   <ImageIcon />
                 </button>
                 <button type="button" className={styles.toolbarButton} aria-label="동영상">
                   <VideoIcon />
+                </button>
+                <div className={styles.toolbarDivider} />
+                <button
+                  type="button"
+                  className={`${styles.toolbarButton} ${editorTab === "edit" ? styles.toolbarButtonActive : ""}`}
+                  onClick={() => setEditorTab("edit")}
+                  aria-label="편집"
+                >
+                  <Pencil2Icon />
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.toolbarButton} ${editorTab === "preview" ? styles.toolbarButtonActive : ""}`}
+                  onClick={() => setEditorTab("preview")}
+                  aria-label="미리보기"
+                >
+                  <EyeOpenIcon />
                 </button>
                 <div style={{ marginLeft: "auto" }}>
                   <button type="button" className={styles.toolbarButton} aria-label="도움말">
@@ -200,53 +240,59 @@ export default function ArticleWritePage() {
                   </button>
                 </div>
               </div>
-              <textarea
-                className={styles.contentTextarea}
-                placeholder="내용을 입력하세요..."
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-              />
+
+              {editorTab === "edit" ? (
+                <textarea
+                  ref={textareaRef}
+                  className={styles.contentTextarea}
+                  placeholder="내용을 입력하세요... 이미지는 툴바의 이미지 버튼으로 추가하세요."
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => { e.preventDefault(); handleImageSelect(e.dataTransfer.files); }}
+                />
+              ) : (
+                <div className={styles.contentPreview}>
+                  {content.trim() ? (
+                    <ReactMarkdown
+                      components={{
+                        img: ({ src }: any) => {
+                          const url = imageMap[src]?.previewUrl;
+                          if (!url) return null;
+                          return <img src={url} alt="" style={{ maxWidth: "100%", borderRadius: "10px", margin: "8px 0", display: "block" }} />;
+                        },
+                        p: ({ children }) => <p style={{ margin: "0 0 1em" }}>{children}</p>,
+                      }}
+                    >
+                      {content}
+                    </ReactMarkdown>
+                  ) : (
+                    <p style={{ color: "var(--text-muted)" }}>미리볼 내용이 없습니다.</p>
+                  )}
+                </div>
+              )}
             </div>
 
-            {/* Image upload */}
-            <div className={styles.uploadSection}>
-              <span className={styles.uploadLabel}>사진 첨부</span>
-              <div
-                className={styles.uploadZone}
-                onClick={() => fileInputRef.current?.click()}
-                onDragOver={(e) => e.preventDefault()}
-                onDrop={handleDrop}
-              >
-                <div className={styles.uploadIcon}>
-                  <CameraIcon width={28} height={28} />
-                </div>
-                <div className={styles.uploadText}>
-                  <p className={styles.uploadTextPrimary}>
-                    클릭하거나 사진을 이곳에 드래그하세요
-                  </p>
-                  <p className={styles.uploadTextSecondary}>
-                    최대 20MB 이하의 JPG, PNG, WEBP 파일
-                  </p>
-                </div>
-              </div>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                multiple
-                hidden
-                onChange={(e) => handleImageSelect(e.target.files)}
-              />
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              multiple
+              hidden
+              onChange={(e) => handleImageSelect(e.target.files)}
+            />
 
-              {imagePreviews.length > 0 && (
+            {Object.keys(imageMap).length > 0 && (
+              <div className={styles.uploadSection}>
+                <span className={styles.uploadLabel}>첨부된 사진 ({Object.keys(imageMap).length}장)</span>
                 <div className={styles.imagePreviewList}>
-                  {imagePreviews.map((src, i) => (
-                    <div key={src} className={styles.imagePreviewItem}>
-                      <img src={src} alt={`첨부 ${i + 1}`} />
+                  {Object.entries(imageMap).map(([id, info]) => (
+                    <div key={id} className={styles.imagePreviewItem}>
+                      <img src={info.previewUrl} alt="첨부" />
                       <button
                         type="button"
                         className={styles.imageRemoveButton}
-                        onClick={() => handleRemoveImage(i)}
+                        onClick={() => handleRemoveImage(id)}
                         aria-label="이미지 제거"
                       >
                         <Cross2Icon width={12} height={12} />
@@ -254,10 +300,8 @@ export default function ArticleWritePage() {
                     </div>
                   ))}
                 </div>
-              )}
-            </div>
-
-            {/* Actions */}
+              </div>
+            )}
             <div className={styles.actions}>
               {submitError && (
                 <p style={{ color: "var(--hot-badge-color, #ff4d4d)", fontSize: "0.875rem", marginRight: "auto" }}>
@@ -282,7 +326,6 @@ export default function ArticleWritePage() {
             </div>
           </div>
 
-          {/* ── Right Column: Sidebar ── */}
           <aside className={styles.sidebar}>
             <div className={styles.sidebarCard}>
               <h3 className={`${styles.sidebarCardTitle} ${styles.sidebarCardTitleAccent}`}>
