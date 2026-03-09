@@ -12,9 +12,9 @@ export default function Sidebar({ boards }: SidebarProps) {
 
   return (
     <aside className={styles.sidebar}>
-      <button className={styles.sidebarButton} type="button">
+      <Link href="/boards/write" className={styles.sidebarButton}>
         <Pencil2Icon /> 글쓰기
-      </button>
+      </Link>
 
       <div className={`${styles.sidebarCard} ${styles.sidebarPopularCard}`}>
         <h3 className={styles.sidebarTitle}>
