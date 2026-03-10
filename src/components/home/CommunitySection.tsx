@@ -13,6 +13,9 @@ type CommunitySectionProps = {
 
 export default function CommunitySection({ board, articles, index }: CommunitySectionProps) {
   const [featured, ...rest] = articles;
+
+  if (!featured) return null;
+
   const thumbnailUrl = toS3ImageUrl(featured.thumbnailKey ?? "");
 
   return (
