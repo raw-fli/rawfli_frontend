@@ -84,11 +84,13 @@ export default function HomeHeader() {
     <>
       <header className={styles.header}>
         <div className={styles.headerInner}>
-          <div className={styles.logo}>
-            <div className={styles.logoMark}>
-              <CameraIcon />
-            </div>
-            <span className={styles.logoTitle}>Raw.fli</span>
+          <div className={styles.logoAndNav}>
+            <Link href="/" className={styles.logo}>
+              <div className={styles.logoMark}>
+                <CameraIcon />
+              </div>
+              <span className={styles.logoTitle}>Raw.fli</span>
+            </Link>
             <nav className={styles.nav}>
               {navItems.map((item, index) => (
                 <Link

@@ -9,6 +9,12 @@
   color: var(--color-accent);
   margin-bottom: 10px;
   display: block;
+  text-decoration: none;
+  width: fit-content;
+}
+
+.boardLabel:hover {
+  text-decoration: underline;
 }
 
 .title {

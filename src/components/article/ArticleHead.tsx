@@ -1,16 +1,18 @@
+import Link from "next/link";
 import { ArticleResponseDto } from "@rawfli/types";
 import styles from "./ArticleHead.module.css";
 
 type ArticleHeadProps = {
   article: ArticleResponseDto;
+  boardId: number;
   boardName: string;
   formattedDate: string;
 };
 
-export default function ArticleHead({ article, boardName, formattedDate }: ArticleHeadProps) {
+export default function ArticleHead({ article, boardId, boardName, formattedDate }: ArticleHeadProps) {
   return (
     <div className={styles.articleHead}>
-      <span className={styles.boardLabel}>{boardName}</span>
+      <Link href={`/boards/${boardId}`} className={styles.boardLabel}>{boardName}</Link>
       <h1 className={styles.title}>{article.title}</h1>
 
       <div className={styles.metaRow}>

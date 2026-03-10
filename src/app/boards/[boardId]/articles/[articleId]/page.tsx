@@ -79,6 +79,7 @@ export default async function ArticleDetailPage({
             <article className={styles.articleCard}>
               <ArticleHead
                 article={article}
+                boardId={parsedBoardId}
                 boardName={boardName}
                 formattedDate={formattedCreatedAt}
               />
