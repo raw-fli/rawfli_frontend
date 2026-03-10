@@ -24,7 +24,7 @@ export default function Sidebar({ boards }: SidebarProps) {
           {boardsList.map((board, index) => (
             <Link
               key={board.id}
-              href={``}
+              href={`/boards/${board.id}`}
               className={`${styles.sidebarItem} ${index === 0 ? styles.sidebarItemActive : ""}`}
             >
               <span>{board.name}</span>

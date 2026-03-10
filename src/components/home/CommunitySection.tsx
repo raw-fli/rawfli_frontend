@@ -21,7 +21,7 @@ export default function CommunitySection({ board, articles, index }: CommunitySe
         <div className={styles.sectionTitle}>
           <span>{board.name}</span>
         </div>
-        <Link href="#" className={styles.sectionAction}>
+        <Link href={`/boards/${board.id}`} className={styles.sectionAction}>
           전체보기
         </Link>
       </div>
