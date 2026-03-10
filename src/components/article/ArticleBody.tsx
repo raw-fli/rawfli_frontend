@@ -21,7 +21,7 @@ export default function ArticleBody({ article, imageUrls, boardId, articleId }: 
   const [loading, setLoading] = useState(false);
 
   const imageIdMap = Object.fromEntries(
-    article.attachedImages.map((img) => [img.id, imageUrls.find((u) => u?.includes(img.key))])
+    article.attachedImages.map((img) => [img.id, imageUrls.find((u) => u?.includes(encodeURI(img.key)))])
   );
 
   const hasInlineImages = /!\[\]\([^)]+\)/.test(article.content);
