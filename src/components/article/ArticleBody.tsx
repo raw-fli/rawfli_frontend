@@ -59,9 +59,10 @@ export default function ArticleBody({ article, imageUrls, boardId, articleId }: 
                       className={styles.image}
                       src={url}
                       alt=""
-                      width={1200}
-                      height={800}
-                      sizes="(max-width: 1024px) 100vw, 75vw"
+                      width={0}
+                      height={0}
+                      sizes="100vw"
+                      style={{ width: '100%', height: 'auto' }}
                     />
                   </span>
                 );
@@ -84,9 +85,10 @@ export default function ArticleBody({ article, imageUrls, boardId, articleId }: 
                     className={styles.image}
                     src={url}
                     alt={article.title}
-                    width={1200}
-                    height={800}
-                    sizes="(max-width: 1024px) 100vw, 75vw"
+                    width={0}
+                    height={0}
+                    sizes="100vw"
+                    style={{ width: '100%', height: 'auto' }}
                   />
                 </div>
               ))}
