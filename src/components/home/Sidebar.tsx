@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Pencil2Icon, LightningBoltIcon } from "@radix-ui/react-icons";
+import { Pencil2Icon, ReaderIcon } from "@radix-ui/react-icons";
 import styles from "./HomePage.module.css";
 import { BoardResponseDto } from "@rawfli/types";
 
@@ -18,7 +18,7 @@ export default function Sidebar({ boards }: SidebarProps) {
 
       <div className={`${styles.sidebarCard} ${styles.sidebarPopularCard}`}>
         <h3 className={styles.sidebarTitle}>
-          <LightningBoltIcon /> 게시판 목록
+          <ReaderIcon /> 게시판 목록
         </h3>
         <div className={styles.sidebarList}>
           {boardsList.map((board, index) => (

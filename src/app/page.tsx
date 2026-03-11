@@ -83,7 +83,7 @@ export default async function Home() {
 
       <main className={styles.main}>
         <div className={styles.grid}>
-          <Sidebar boards={feeds.map((feed) => feed.board)} />
+          <Sidebar boards={communityBoards.map((feed) => feed.board)} />
 
           <div className={styles.content}>
             <div id="community">

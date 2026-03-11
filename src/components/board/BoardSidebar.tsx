@@ -1,6 +1,5 @@
 import Link from "next/link";
 import {
-  LightningBoltIcon,
   RocketIcon,
   ChatBubbleIcon,
   QuestionMarkCircledIcon,
@@ -32,7 +31,7 @@ export default function BoardSidebar({ boards, currentBoardId, popularArticles }
     <aside className={styles.sidebar}>
       <div className={styles.sidebarCard}>
         <h3 className={styles.sidebarTitle}>
-          <LightningBoltIcon className={styles.sidebarTitleIcon} />
+          <ReaderIcon className={styles.sidebarTitleIcon} />
           인기 게시판
         </h3>
         <div className={styles.sidebarList}>

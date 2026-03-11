@@ -329,13 +329,6 @@
   box-shadow: var(--shadow-sm);
 }
 
-.sidebarPopularCard {
-  height: 252px;
-  min-height: 252px;
-  max-height: 252px;
-  overflow: hidden;
-}
-
 .sidebarStatsCard {
   height: 142px;
   min-height: 142px;
