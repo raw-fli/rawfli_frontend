@@ -7,7 +7,7 @@ import CommentSection from "@/components/article/CommentSection";
 import ArticleSidebar from "@/components/article/ArticleSidebar";
 import { toS3ImageUrl } from "@/shared/utils/image";
 import styles from "./page.module.css";
-import { articleControllerGetArticle, articleControllerGetPopularArticles, ArticleListResponseDto, ArticleResponseDto, BoardResponseDto, boardsControllerGetBoard } from "@rawfli/types";
+import { articleControllerGetArticle, articleControllerGetPopularArticles, boardsControllerGetBoard } from "@rawfli/types";
 
 type RouteParams = {
   boardId: string;

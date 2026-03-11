@@ -57,7 +57,7 @@ export default function ArticleWritePage() {
       const communityBoards = res.data.filter((b) => b.type === "community");
       setBoards(communityBoards);
     });
-  }, [router]);
+  }, []);
 
 
   const insertAtCursor = (text: string) => {
