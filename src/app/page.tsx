@@ -3,7 +3,15 @@ import Sidebar from "@/components/home/Sidebar";
 import CommunitySection from "@/components/home/CommunitySection";
 import HomeFooter from "@/components/home/HomeFooter";
 import styles from "@/components/home/HomePage.module.css";
-import { articleControllerGetArticle, articleControllerGetArticles, articleControllerGetPopularArticles, ArticleListItemResponseDto, ArticleListResponseDto, BoardResponseDto, boardsControllerGetBoards } from "@rawfli/types";
+import {
+  articleControllerGetArticle,
+  articleControllerGetArticles,
+  articleControllerGetPopularArticles,
+  ArticleListItemResponseDto,
+  ArticleListResponseDto,
+  BoardResponseDto,
+  boardsControllerGetBoards,
+} from "@rawfli/types";
 
 type BoardFeed = {
   board: BoardResponseDto;

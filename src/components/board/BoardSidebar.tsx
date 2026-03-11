@@ -11,7 +11,7 @@ import { ArticleListItemResponseDto, BoardResponseDto } from "@rawfli/types";
 type BoardSidebarProps = {
   boards: BoardResponseDto[];
   currentBoardId: number;
-  popularArticles: ArticleListItemResponseDto[];
+  popularArticles?: ArticleListItemResponseDto[];
 };
 
 const BOARD_ICONS: Record<string, React.ReactNode> = {
@@ -24,7 +24,7 @@ function getBoardIcon(name: string) {
   return BOARD_ICONS[name] ?? BOARD_ICONS.default;
 }
 
-export default function BoardSidebar({ boards, currentBoardId, popularArticles }: BoardSidebarProps) {
+export default function BoardSidebar({ boards, currentBoardId, popularArticles = [] }: BoardSidebarProps) {
   const communityBoards = boards.filter((b) => b.type === "community");
 
   return (
