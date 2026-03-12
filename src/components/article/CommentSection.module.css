@@ -60,6 +60,10 @@
   font-weight: 700;
 }
 
+.commentAuthor:hover {
+  text-decoration: underline;
+}
+
 .commentTime {
   color: var(--text-muted);
   font-size: 12px;

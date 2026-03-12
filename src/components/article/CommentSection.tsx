@@ -6,6 +6,7 @@ import { ApiError } from "@/lib/api";
 import { isLoggedIn } from "@/lib/auth";
 import styles from "./CommentSection.module.css";
 import { articleControllerCreateComment, CommentResponseDto } from "@rawfli/types";
+import Link from "next/link";
 
 type CommentSectionProps = {
   comments: CommentResponseDto[];
@@ -30,12 +31,12 @@ function CommentItem({ comment, depth = 0, parentAuthor }: { comment: CommentRes
         style={depth > 0 ? { marginLeft: `${Math.min(depth, 3) * 24}px` } : undefined}
       >
         <div className={styles.commentMeta}>
-          <span className={styles.commentAuthor}>
+          <Link href={`/users/${comment.author.id}`} className={styles.commentAuthor}>
             {comment.author.username}
             {parentAuthor && (
               <span className={styles.replyIndicator}> → @{parentAuthor}</span>
             )}
-          </span>
+          </Link>
           <span className={styles.commentTime}>{formatRelativeTime(comment.createdAt)}</span>
         </div>
         <p className={styles.commentText}>{comment.content}</p>
