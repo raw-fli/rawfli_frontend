@@ -8,6 +8,7 @@ import PostTable from "@/components/board/PostTable";
 import Pagination from "@/components/board/Pagination";
 import Link from "next/link";
 import { Pencil2Icon } from "@radix-ui/react-icons";
+import "@/lib/server-api";
 import styles from "@/components/board/BoardPage.module.css";
 import {
   articleControllerGetArticles,

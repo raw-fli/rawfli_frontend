@@ -8,6 +8,7 @@ import ArticleSidebar from "@/components/article/ArticleSidebar";
 import { toS3ImageUrl } from "@/shared/utils/image";
 import styles from "./page.module.css";
 import { articleControllerGetArticle, articleControllerGetPopularArticles, boardsControllerGetBoard } from "@rawfli/types";
+import "@/lib/server-api";
 
 type RouteParams = {
   boardId: string;

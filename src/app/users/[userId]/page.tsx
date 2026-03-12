@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import HomeHeader from "@/components/home/HomeHeader";
 import HomeFooter from "@/components/home/HomeFooter";
 import UserProfilePage from "@/components/user/UserProfilePage";
+import "@/lib/server-api";
 import { usersControllerGetUser } from "@rawfli/types";
 
 type RouteParams = {

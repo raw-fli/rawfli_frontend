@@ -4,6 +4,7 @@ import CommunitySection from "@/components/home/CommunitySection";
 import GallerySection from "@/components/home/GallerySection";
 import HomeFooter from "@/components/home/HomeFooter";
 import styles from "@/components/home/HomePage.module.css";
+import "@/lib/server-api";
 import {
   articleControllerGetArticle,
   articleControllerGetArticles,

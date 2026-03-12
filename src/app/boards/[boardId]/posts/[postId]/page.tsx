@@ -5,6 +5,7 @@ import PostHead from "@/components/post/PostHead";
 import PostBody from "@/components/post/PostBody";
 import ArticleSidebar from "@/components/article/ArticleSidebar";
 import styles from "./page.module.css";
+import "@/lib/server-api";
 import {
   postsControllerGetPost,
   boardsControllerGetBoard,
