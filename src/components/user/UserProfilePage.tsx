@@ -21,6 +21,7 @@ export default function UserProfilePage({ user }: UserProfilePageProps) {
   const [activeTab, setActiveTab] = useState<Tab>("posts");
 
   const profileImageUrl = toS3ImageUrl(user.profileImageKey ?? undefined);
+  console.log(user);
 
   return (
     <div className={styles.page}>
@@ -97,14 +98,14 @@ export default function UserProfilePage({ user }: UserProfilePageProps) {
           </div>
         </div>
 
-        {activeTab === "articles" && <ArticlesTab articles={user.articles} />}
+        {activeTab === "articles" && <ArticlesTab articles={user.articles} username={user.username} />}
         {activeTab === "posts" && <PostsTab />}
       </main>
     </div>
   );
 }
 
-function ArticlesTab({ articles }: { articles: ArticleListItemResponseDto[] }) {
+function ArticlesTab({ articles, username }: { articles: ArticleListItemResponseDto[]; username: string }) {
   if (articles.length === 0) {
     return (
       <div className={styles.empty}>
@@ -122,7 +123,7 @@ function ArticlesTab({ articles }: { articles: ArticleListItemResponseDto[] }) {
           <h3 className={styles.postTitle}>{article.title}</h3>
           <p className={styles.postContent}>{article.content}</p>
           <div className={styles.postMeta}>
-            <span>{article.author.username}</span>
+            <span>{username}</span>
             <span>{formatRelativeTime(article.createdAt)}</span>
           </div>
         </div>

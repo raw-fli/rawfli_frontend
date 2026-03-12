@@ -2,19 +2,10 @@ import { notFound } from "next/navigation";
 import HomeHeader from "@/components/home/HomeHeader";
 import HomeFooter from "@/components/home/HomeFooter";
 import UserProfilePage from "@/components/user/UserProfilePage";
-import {
-  usersControllerGetUser,
-  type UserInfoResponseDto,
-} from "@rawfli/types";
+import { usersControllerGetUser } from "@rawfli/types";
 
 type RouteParams = {
   userId: string;
-};
-
-type WrappedResponse = {
-  result: boolean;
-  code: number;
-  data: UserInfoResponseDto;
 };
 
 export default async function UserPage({
@@ -29,11 +20,9 @@ export default async function UserPage({
     notFound();
   }
 
-  const userResp = (await usersControllerGetUser(
-    parsedUserId,
-  )) as unknown as WrappedResponse;
+  const userResp = (await usersControllerGetUser(parsedUserId));
 
-  if (!userResp?.data) {
+  if (!userResp.result) {
     notFound();
   }
 
