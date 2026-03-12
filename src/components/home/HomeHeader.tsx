@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { BellIcon, CameraIcon, ExitIcon, GearIcon, PersonIcon } from "@radix-ui/react-icons";
 import SearchBar from "./SearchBar";
 import styles from "./HomePage.module.css";
 import AuthModal from "@/components/auth/AuthModal";
-import { isLoggedIn, removeToken } from "@/lib/auth";
+import { getUserIdFromToken, isLoggedIn, removeToken } from "@/lib/auth";
 
 type NavItem = {
   label: string;
@@ -20,6 +21,7 @@ const navItems: NavItem[] = [
 ];
 
 export default function HomeHeader() {
+  const router = useRouter();
   const profileMenuRef = useRef<HTMLDivElement>(null);
   const [authOpen, setAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState<"login" | "signup">("login");
@@ -80,6 +82,14 @@ export default function HomeHeader() {
     setProfileMenuOpen(false);
   };
 
+  const handleMyPage = () => {
+    const userId = getUserIdFromToken();
+    if (userId) {
+      router.push(`/users/${userId}`);
+      setProfileMenuOpen(false);
+    }
+  };
+
   return (
     <>
       <header className={styles.header}>
@@ -127,7 +137,7 @@ export default function HomeHeader() {
 
                   {profileMenuOpen && (
                     <div className={styles.profileMenu} role="menu" aria-label="프로필 메뉴">
-                      <button type="button" className={styles.profileMenuItem} role="menuitem">
+                      <button type="button" className={styles.profileMenuItem} role="menuitem" onClick={handleMyPage}>
                         <PersonIcon /> 마이페이지
                       </button>
                       <button type="button" className={styles.profileMenuItem} role="menuitem">
