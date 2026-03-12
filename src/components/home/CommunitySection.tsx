@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ChatBubbleIcon, EyeOpenIcon, HeartIcon, ImageIcon, PersonIcon } from "@radix-ui/react-icons";
 import { toS3ImageUrl } from "@/shared/utils/image";
 import { formatRelativeTime } from "@/shared/utils/time";
+import { stripMarkdown } from "@/shared/utils/text";
 import styles from "./HomePage.module.css";
 import { ArticleListItemResponseDto, BoardResponseDto } from "@rawfli/types";
 
@@ -49,7 +50,7 @@ export default function CommunitySection({ board, articles, index }: CommunitySe
               <div>
                 <span className={styles.featuredBadge}>BEST</span>
                 <div className={styles.featuredTitle}>{featured.title}</div>
-                <p className={styles.featuredText}>{featured.content?.replace(/!\[\]\([^)]*\)/g, "").replace(/[*_`#>~\[\]]/g, "").trim() || "본문이 없습니다."}</p>
+                <p className={styles.featuredText}>{stripMarkdown(featured.content ?? "") || "본문이 없습니다."}</p>
                 <div className={styles.metaRow}>
                   <span className={styles.metaInline}>
                     <span className={`${styles.metaIconItem} ${styles.metaLikeItem}`}>

@@ -9,6 +9,7 @@ import {
 import type { UserInfoResponseDto, ArticleListItemResponseDto } from "@rawfli/types";
 import { toS3ImageUrl } from "@/shared/utils/image";
 import { formatRelativeTime } from "@/shared/utils/time";
+import { stripMarkdown } from "@/shared/utils/text";
 import styles from "./UserProfilePage.module.css";
 
 type Tab = "articles" | "posts";
@@ -18,7 +19,7 @@ interface UserProfilePageProps {
 }
 
 export default function UserProfilePage({ user }: UserProfilePageProps) {
-  const [activeTab, setActiveTab] = useState<Tab>("posts");
+  const [activeTab, setActiveTab] = useState<Tab>("articles");
 
   const profileImageUrl = toS3ImageUrl(user.profileImageKey ?? undefined);
   console.log(user);
@@ -121,7 +122,7 @@ function ArticlesTab({ articles, username }: { articles: ArticleListItemResponse
       {articles.map((article) => (
         <div key={article.id} className={styles.postCard}>
           <h3 className={styles.postTitle}>{article.title}</h3>
-          <p className={styles.postContent}>{article.content}</p>
+          <p className={styles.postContent}>{stripMarkdown(article.content ?? "")}</p>
           <div className={styles.postMeta}>
             <span>{username}</span>
             <span>{formatRelativeTime(article.createdAt)}</span>
