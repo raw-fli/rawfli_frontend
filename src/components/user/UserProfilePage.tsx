@@ -11,6 +11,7 @@ import { toS3ImageUrl } from "@/shared/utils/image";
 import { formatRelativeTime } from "@/shared/utils/time";
 import { stripMarkdown } from "@/shared/utils/text";
 import styles from "./UserProfilePage.module.css";
+import Link from "next/link";
 
 type Tab = "articles" | "posts";
 
@@ -22,7 +23,6 @@ export default function UserProfilePage({ user }: UserProfilePageProps) {
   const [activeTab, setActiveTab] = useState<Tab>("articles");
 
   const profileImageUrl = toS3ImageUrl(user.profileImageKey ?? undefined);
-  console.log(user);
 
   return (
     <div className={styles.page}>
@@ -125,12 +125,15 @@ function ArticlesTab({ articles, username }: { articles: ArticleListItemResponse
           <div key={article.id} className={styles.postCard}>
             <div className={styles.postCardInner}>
               <div className={styles.postCardBody}>
-                <h3 className={styles.postTitle}>{article.title}</h3>
-                <p className={styles.postContent}>{stripMarkdown(article.content ?? "")}</p>
-                <div className={styles.postMeta}>
-                  <span>{username}</span>
-                  <span>{formatRelativeTime(article.createdAt)}</span>
-                </div>
+                <Link href={`/boards/${article.boardId}`} className={styles.postBoardName}>{article.boardName}</Link>
+                <Link href={`/boards/${article.boardId}/articles/${article.id}`} className={styles.postCardLink}>
+                  <h3 className={styles.postTitle}>{article.title}</h3>
+                  <p className={styles.postContent}>{stripMarkdown(article.content ?? "")}</p>
+                  <div className={styles.postMeta}>
+                    <span>{username}</span>
+                    <span>{formatRelativeTime(article.createdAt)}</span>
+                  </div>
+                </Link>
               </div>
               {thumbUrl && (
                 <div
