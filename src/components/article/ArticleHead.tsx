@@ -16,7 +16,7 @@ export default function ArticleHead({ article, boardId, boardName, formattedDate
       <h1 className={styles.title}>{article.title}</h1>
 
       <div className={styles.metaRow}>
-        <span className={styles.metaStrong}>{article.author.username}</span>
+        <Link href={`/users/${article.author.id}`} className={styles.metaStrong}>{article.author.username}</Link>
         <span className={styles.metaDivider}>·</span>
         <span>{formattedDate}</span>
         <span className={styles.metaDivider}>·</span>
