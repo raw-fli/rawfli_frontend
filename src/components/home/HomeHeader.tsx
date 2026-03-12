@@ -8,6 +8,8 @@ import SearchBar from "./SearchBar";
 import styles from "./HomePage.module.css";
 import AuthModal from "@/components/auth/AuthModal";
 import { getUserIdFromToken, isLoggedIn, removeToken } from "@/lib/auth";
+import { useMeControllerGetMe } from "@rawfli/types";
+import { toS3ImageUrl } from "@/shared/utils/image";
 
 type NavItem = {
   label: string;
@@ -27,6 +29,11 @@ export default function HomeHeader() {
   const [authMode, setAuthMode] = useState<"login" | "signup">("login");
   const [loggedIn, setLoggedIn] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+
+  const { data: meResp } = useMeControllerGetMe({ query: { enabled: loggedIn } });
+  const profileImageUrl = meResp?.data?.profileImageKey
+    ? toS3ImageUrl(meResp.data.profileImageKey)
+    : null;
 
   useEffect(() => {
     const syncLoginState = () => {
@@ -132,7 +139,15 @@ export default function HomeHeader() {
                     aria-expanded={profileMenuOpen}
                     onClick={() => setProfileMenuOpen((prev) => !prev)}
                   >
-                    <PersonIcon />
+                    {profileImageUrl ? (
+                      <img
+                        src={profileImageUrl}
+                        alt="프로필"
+                        style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "9999px" }}
+                      />
+                    ) : (
+                      <PersonIcon />
+                    )}
                   </button>
 
                   {profileMenuOpen && (
@@ -140,7 +155,7 @@ export default function HomeHeader() {
                       <button type="button" className={styles.profileMenuItem} role="menuitem" onClick={handleMyPage}>
                         <PersonIcon /> 마이페이지
                       </button>
-                      <button type="button" className={styles.profileMenuItem} role="menuitem">
+                      <button type="button" className={styles.profileMenuItem} role="menuitem" onClick={() => { router.push("/settings"); setProfileMenuOpen(false); }}>
                         <GearIcon /> 설정
                       </button>
                       <button

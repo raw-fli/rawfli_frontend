@@ -7,6 +7,8 @@ import { isLoggedIn } from "@/lib/auth";
 import styles from "./CommentSection.module.css";
 import { articleControllerCreateComment, CommentResponseDto } from "@rawfli/types";
 import Link from "next/link";
+import { PersonIcon } from "@radix-ui/react-icons";
+import { toS3ImageUrl } from "@/shared/utils/image";
 
 type CommentSectionProps = {
   comments: CommentResponseDto[];
@@ -32,6 +34,17 @@ function CommentItem({ comment, depth = 0, parentAuthor }: { comment: CommentRes
       >
         <div className={styles.commentMeta}>
           <Link href={`/users/${comment.author.id}`} className={styles.commentAuthor}>
+            <span className={styles.commentAvatar}>
+              {comment.author.profileImageKey ? (
+                <img
+                  src={toS3ImageUrl(comment.author.profileImageKey)}
+                  alt={comment.author.username}
+                  className={styles.commentAvatarImg}
+                />
+              ) : (
+                <PersonIcon className={styles.commentAvatarIcon} />
+              )}
+            </span>
             {comment.author.username}
             {parentAuthor && (
               <span className={styles.replyIndicator}> → @{parentAuthor}</span>

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ChatBubbleIcon, ImageIcon } from "@radix-ui/react-icons";
+import { ChatBubbleIcon, ImageIcon, PersonIcon } from "@radix-ui/react-icons";
 import { toS3ImageUrl } from "@/shared/utils/image";
 import styles from "./BoardPage.module.css";
 import { ArticleListItemResponseDto } from "@rawfli/types";
@@ -18,6 +18,9 @@ export default function PopularArticleCards({ boardId, articles }: PopularArticl
     <section className={styles.bestCards}>
       {articles.slice(0, 3).map((article, index) => {
         const thumbnailUrl = toS3ImageUrl(article.thumbnailKey ?? "");
+        const avatarUrl = article.author.profileImageKey
+          ? toS3ImageUrl(article.author.profileImageKey)
+          : null;
         const initial = article.author.username?.charAt(0).toUpperCase() ?? "?";
         const avatarColor = AVATAR_COLORS[index % AVATAR_COLORS.length];
 
@@ -49,9 +52,11 @@ export default function PopularArticleCards({ boardId, articles }: PopularArticl
                 <div className={styles.bestCardAuthor}>
                   <div
                     className={styles.bestCardAvatar}
-                    style={{ backgroundColor: avatarColor }}
+                    style={avatarUrl ? undefined : { backgroundColor: avatarColor }}
                   >
-                    {initial}
+                    {avatarUrl ? (
+                      <img src={avatarUrl} alt={article.author.username} style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "9999px" }} />
+                    ) : initial}
                   </div>
                   <Link href={`/users/${article.author.id}`} className={styles.bestCardAuthorName}>
                     {article.author.username}
