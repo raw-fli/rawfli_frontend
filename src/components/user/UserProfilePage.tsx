@@ -56,6 +56,7 @@ export default function UserProfilePage({ user }: UserProfilePageProps) {
                 </button>
               </div>
             </div>
+            <p className={styles.bio}>{user.bio}</p>
 
             <div className={styles.stats}>
               <div className={styles.statItem}>

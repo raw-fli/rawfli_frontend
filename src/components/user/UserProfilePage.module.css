@@ -145,6 +145,13 @@
   background-color: var(--input-bg);
 }
 
+.bio {
+  font-size: 14px;
+  color: var(--text-secondary);
+  max-width: 600px;
+  padding-bottom: 24px;
+}
+
 /* Stats */
 .stats {
   display: flex;
