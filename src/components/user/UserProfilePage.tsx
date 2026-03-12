@@ -86,7 +86,7 @@ export default function UserProfilePage({ user }: UserProfilePageProps) {
               onClick={() => setActiveTab("articles")}
             >
               <FileTextIcon className={styles.tabIcon} />
-              내 게시글
+              게시글
             </button>
             <button
               type="button"
@@ -94,7 +94,7 @@ export default function UserProfilePage({ user }: UserProfilePageProps) {
               onClick={() => setActiveTab("posts")}
             >
               <ImageIcon className={styles.tabIcon} />
-              내 포스트
+              포스트
             </button>
           </div>
         </div>
@@ -119,16 +119,29 @@ function ArticlesTab({ articles, username }: { articles: ArticleListItemResponse
 
   return (
     <div className={styles.postGrid}>
-      {articles.map((article) => (
-        <div key={article.id} className={styles.postCard}>
-          <h3 className={styles.postTitle}>{article.title}</h3>
-          <p className={styles.postContent}>{stripMarkdown(article.content ?? "")}</p>
-          <div className={styles.postMeta}>
-            <span>{username}</span>
-            <span>{formatRelativeTime(article.createdAt)}</span>
+      {articles.map((article) => {
+        const thumbUrl = toS3ImageUrl(article.thumbnailKey ?? undefined);
+        return (
+          <div key={article.id} className={styles.postCard}>
+            <div className={styles.postCardInner}>
+              <div className={styles.postCardBody}>
+                <h3 className={styles.postTitle}>{article.title}</h3>
+                <p className={styles.postContent}>{stripMarkdown(article.content ?? "")}</p>
+                <div className={styles.postMeta}>
+                  <span>{username}</span>
+                  <span>{formatRelativeTime(article.createdAt)}</span>
+                </div>
+              </div>
+              {thumbUrl && (
+                <div
+                  className={styles.postThumb}
+                  style={{ backgroundImage: `url(${thumbUrl})` }}
+                />
+              )}
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
