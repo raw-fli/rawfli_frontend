@@ -113,7 +113,6 @@ export default async function BoardPage({
     );
   }
 
-  // Community board — articles
   const [articlesResp, popularResp] = await Promise.all([
     articleControllerGetArticles(parsedBoardId, {
       page: currentPage,

@@ -22,12 +22,11 @@ export default function PopularArticleCards({ boardId, articles }: PopularArticl
         const avatarColor = AVATAR_COLORS[index % AVATAR_COLORS.length];
 
         return (
-          <Link
+          <div
             key={article.id}
-            href={`/boards/${boardId}/articles/${article.id}`}
             className={styles.bestCard}
           >
-            <div className={styles.bestCardImageWrap}>
+            <Link href={`/boards/${boardId}/articles/${article.id}`} className={styles.bestCardImageWrap}>
               {thumbnailUrl ? (
                 <img
                   src={thumbnailUrl}
@@ -40,10 +39,12 @@ export default function PopularArticleCards({ boardId, articles }: PopularArticl
                 </div>
               )}
               <div className={styles.bestCardBadge}>BEST {index + 1}</div>
-            </div>
+            </Link>
 
             <div className={styles.bestCardBody}>
-              <h4 className={styles.bestCardTitle}>{article.title}</h4>
+              <Link href={`/boards/${boardId}/articles/${article.id}`} className={styles.bestCardTitle}>
+                {article.title}
+              </Link>
               <div className={styles.bestCardMeta}>
                 <div className={styles.bestCardAuthor}>
                   <div
@@ -52,9 +53,9 @@ export default function PopularArticleCards({ boardId, articles }: PopularArticl
                   >
                     {initial}
                   </div>
-                  <span className={styles.bestCardAuthorName}>
+                  <Link href={`/users/${article.author.id}`} className={styles.bestCardAuthorName}>
                     {article.author.username}
-                  </span>
+                  </Link>
                 </div>
                 <div className={styles.bestCardComments}>
                   <ChatBubbleIcon />
@@ -64,7 +65,7 @@ export default function PopularArticleCards({ boardId, articles }: PopularArticl
                 </div>
               </div>
             </div>
-          </Link>
+          </div>
         );
       })}
     </section>
