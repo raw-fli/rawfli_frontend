@@ -160,6 +160,12 @@
   color: #4f6483;
 }
 
+.modalNotice {
+  margin-top: 8px;
+  color: #33597f !important;
+  font-size: 0.86rem;
+}
+
 .targetList {
   margin-top: 12px;
   display: grid;

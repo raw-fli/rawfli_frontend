@@ -2,10 +2,12 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import { ExitIcon, GearIcon, HomeIcon, MixerHorizontalIcon } from "@radix-ui/react-icons";
 import { isAdminLoggedIn, removeAdminToken } from "@/lib/admin-auth";
 import styles from "@/app/admin/dashboard/dashboard-layout.module.css";
+
+const emptySubscribe = () => () => {};
 
 function isActive(pathname: string, href: string): boolean {
   if (href === "/admin/dashboard") return pathname === href;
@@ -16,7 +18,8 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   const router = useRouter();
   const pathname = usePathname();
   const isAuthPage = pathname === "/admin";
-  const isAuthorized = isAuthPage || isAdminLoggedIn();
+  const isClient = useSyncExternalStore(emptySubscribe, () => true, () => false);
+  const isAuthorized = isAuthPage || (isClient && isAdminLoggedIn());
 
   useEffect(() => {
     if (!isAuthorized) {

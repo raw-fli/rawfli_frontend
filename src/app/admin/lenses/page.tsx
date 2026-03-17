@@ -58,7 +58,7 @@ export default function AdminLensesPage() {
 
   const onMerge = async () => {
     if (!targetId) return;
-    const sourceIds = selectedIds.filter((id) => id !== targetId);
+    const sourceIds = [...new Set(selectedIds.filter((id) => id !== targetId))];
     if (sourceIds.length === 0) return;
 
     try {
@@ -169,6 +169,7 @@ export default function AdminLensesPage() {
           <div className={styles.modal}>
             <h2>병합 대상 선택</h2>
             <p>유지할 렌즈를 target으로 선택하세요. 나머지 선택 항목은 모두 이 렌즈로 합쳐집니다.</p>
+            <p className={styles.modalNotice}>source 모델명/별칭은 target의 alias로 보존됩니다.</p>
             <div className={styles.targetList}>
               {selectedItems.map((lens) => (
                 <label key={lens.id} className={styles.targetRow}>

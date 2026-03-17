@@ -58,7 +58,7 @@ export default function AdminCamerasPage() {
 
   const onMerge = async () => {
     if (!targetId) return;
-    const sourceIds = selectedIds.filter((id) => id !== targetId);
+    const sourceIds = [...new Set(selectedIds.filter((id) => id !== targetId))];
     if (sourceIds.length === 0) return;
 
     try {
@@ -169,6 +169,7 @@ export default function AdminCamerasPage() {
           <div className={styles.modal}>
             <h2>병합 대상 선택</h2>
             <p>유지할 카메라를 target으로 선택하세요. 나머지 선택 항목은 모두 이 카메라로 합쳐집니다.</p>
+            <p className={styles.modalNotice}>source 모델명/별칭은 target의 alias로 보존됩니다.</p>
             <div className={styles.targetList}>
               {selectedItems.map((camera) => (
                 <label key={camera.id} className={styles.targetRow}>
