@@ -49,6 +49,9 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
     { href: "/admin/dashboard", label: "대시보드", icon: <HomeIcon /> },
     { href: "/admin/cameras", label: "카메라 관리", icon: <GearIcon /> },
     { href: "/admin/lenses", label: "렌즈 관리", icon: <MixerHorizontalIcon /> },
+    { href: "/admin/images", label: "업로드 이미지", icon: <GearIcon /> },
+    { href: "/admin/deleted-posts", label: "삭제 게시글", icon: <MixerHorizontalIcon /> },
+    { href: "/admin/deleted-comments", label: "삭제 댓글", icon: <MixerHorizontalIcon /> },
   ];
 
   return (

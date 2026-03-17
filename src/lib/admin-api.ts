@@ -5,6 +5,12 @@ export {
   useAdminControllerMergeCameras,
   useAdminControllerGetUnverifiedLenses,
   useAdminControllerMergeLenses,
+  useAdminControllerGetImages,
+  useAdminControllerGetDeletedPosts,
+  useAdminControllerGetDeletedComments,
+  type AdminImageResponseDto,
+  type DeletedPostResponseDto,
+  type DeletedCommentResponseDto,
   type CameraResponseDto,
   type LensResponseDto,
 } from "@rawfli/types";
