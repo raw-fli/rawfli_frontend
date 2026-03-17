@@ -1,0 +1,93 @@
+.container {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 32px;
+}
+
+.card {
+  width: 100%;
+  max-width: 420px;
+  border-radius: 14px;
+  border: 1px solid #d2d8e4;
+  background: #ffffff;
+  box-shadow: 0 24px 50px rgba(18, 34, 66, 0.08);
+  padding: 28px;
+}
+
+.title {
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: #172338;
+}
+
+.subtitle {
+  margin-top: 6px;
+  color: #4a5d7f;
+  font-size: 0.95rem;
+}
+
+.form {
+  margin-top: 18px;
+  display: grid;
+  gap: 10px;
+}
+
+.label {
+  color: #314667;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.input {
+  border: 1px solid #c6d0df;
+  border-radius: 10px;
+  background: #f8fbff;
+  color: #172338;
+  padding: 10px 12px;
+  outline: none;
+}
+
+.input::placeholder {
+  color: #6b7f9e;
+}
+
+.input:focus {
+  border-color: #1f4a88;
+  box-shadow: 0 0 0 3px rgba(40, 92, 176, 0.15);
+}
+
+.message {
+  color: #8f2d2d;
+  font-size: 0.88rem;
+}
+
+.success {
+  color: #1f6a42;
+  font-size: 0.88rem;
+}
+
+.submitButton {
+  margin-top: 8px;
+  border: 0;
+  border-radius: 10px;
+  background: linear-gradient(120deg, #0d1f39, #1a4f74);
+  color: #f7fafc;
+  font-weight: 700;
+  padding: 11px 14px;
+  cursor: pointer;
+}
+
+.submitButton:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.switchButton {
+  margin-top: 14px;
+  border: 0;
+  background: transparent;
+  color: #0f3a72;
+  font-weight: 600;
+  cursor: pointer;
+}

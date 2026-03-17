@@ -10,7 +10,7 @@ configureApiClient({
   getToken: getApiToken,
 });
 
-export default function QueryProvider({ children }: { children: React.ReactNode }) {
+export default function AdminQueryProvider({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
 
   return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
