@@ -2,12 +2,10 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useSyncExternalStore } from "react";
+import { useEffect, useState } from "react";
 import { ExitIcon, GearIcon, HomeIcon, MixerHorizontalIcon } from "@radix-ui/react-icons";
 import { isAdminLoggedIn, removeAdminToken } from "@/lib/admin-auth";
 import styles from "@/app/admin/dashboard/dashboard-layout.module.css";
-
-const emptySubscribe = () => () => {};
 
 function isActive(pathname: string, href: string): boolean {
   if (href === "/admin/dashboard") return pathname === href;
@@ -18,20 +16,32 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   const router = useRouter();
   const pathname = usePathname();
   const isAuthPage = pathname === "/admin";
-  const isClient = useSyncExternalStore(emptySubscribe, () => true, () => false);
-  const isAuthorized = isAuthPage || (isClient && isAdminLoggedIn());
+  const [isAuthorized, setIsAuthorized] = useState(isAuthPage);
+  const [isAuthChecked, setIsAuthChecked] = useState(isAuthPage);
 
   useEffect(() => {
-    if (!isAuthorized) {
+    if (isAuthPage) {
+      setIsAuthorized(true);
+      setIsAuthChecked(true);
+      return;
+    }
+
+    const authorized = isAdminLoggedIn();
+    setIsAuthorized(authorized);
+    setIsAuthChecked(true);
+  }, [isAuthPage]);
+
+  useEffect(() => {
+    if (!isAuthPage && isAuthChecked && !isAuthorized) {
       router.replace("/admin");
     }
-  }, [isAuthorized, router]);
+  }, [isAuthPage, isAuthChecked, isAuthorized, router]);
 
   if (isAuthPage) {
     return <>{children}</>;
   }
 
-  if (!isAuthorized) {
+  if (!isAuthChecked || !isAuthorized) {
     return <div className={styles.guard}>관리자 인증을 확인하는 중입니다.</div>;
   }
 
