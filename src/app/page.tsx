@@ -43,7 +43,7 @@ async function loadBoardFeeds(): Promise<BoardFeed[]> {
   const feeds = await Promise.all(
     boards.map(async (board) => {
       if (board.type === "gallery") {
-        const postsData = await postsControllerGetPosts(board.id, { page: "1", limit: "5" });
+        const postsData = await postsControllerGetPosts(board.id, { page: 1, limit: 5 });
         const posts: PostListItemResponseDto[] = postsData?.data?.posts ?? [];
         return { board, posts };
       }
