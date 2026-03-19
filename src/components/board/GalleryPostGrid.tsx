@@ -31,6 +31,12 @@ function getThumbnailUrl(post: PostListItemResponseDto) {
   return toS3ImageUrl(thumbnailKey);
 }
 
+function getAuthorProfileImageUrl(post: PostListItemResponseDto) {
+  const profileImageKey = post.author.profileImageKey;
+  if (!profileImageKey) return "";
+  return toS3ImageUrl(profileImageKey);
+}
+
 export default function GalleryPostGrid({ boardId, boardName, posts }: GalleryPostGridProps) {
   return (
     <section className={styles.gallerySection}>
@@ -48,6 +54,7 @@ export default function GalleryPostGrid({ boardId, boardName, posts }: GalleryPo
         <div className={styles.galleryGrid}>
           {posts.map((post) => {
             const thumbnailUrl = getThumbnailUrl(post);
+            const authorProfileImageUrl = getAuthorProfileImageUrl(post);
 
             return (
             <Link
@@ -76,7 +83,17 @@ export default function GalleryPostGrid({ boardId, boardName, posts }: GalleryPo
 
                 <div className={styles.galleryMetaRow}>
                   <div className={styles.galleryAuthor}>
-                    <div className={styles.galleryAuthorBadge}>{getAuthorBadge(post.author.username)}</div>
+                    <div className={styles.galleryAuthorBadge}>
+                      {authorProfileImageUrl ? (
+                        <img
+                          src={authorProfileImageUrl}
+                          alt={post.author.username}
+                          className={styles.galleryAuthorAvatarImage}
+                        />
+                      ) : (
+                        getAuthorBadge(post.author.username)
+                      )}
+                    </div>
                     <span className={styles.galleryAuthorName}>{post.author.username}</span>
                   </div>
                   <span className={styles.galleryDate}>{formatRelativeTime(post.createdAt)}</span>
