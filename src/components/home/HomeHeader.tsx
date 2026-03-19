@@ -12,17 +12,22 @@ import { useMeControllerGetMe } from "@rawfli/types";
 import { toS3ImageUrl } from "@/shared/utils/image";
 
 type NavItem = {
+  key: "community" | "gallery" | "gear";
   label: string;
   href: string;
 };
 
 const navItems: NavItem[] = [
-  { label: "커뮤니티", href: "#" },
-  { label: "갤러리", href: "#" },
-  { label: "장비", href: "#" },
+  { key: "community", label: "커뮤니티", href: "#" },
+  { key: "gallery", label: "갤러리", href: "#" },
+  { key: "gear", label: "장비", href: "#" },
 ];
 
-export default function HomeHeader() {
+type HomeHeaderProps = {
+  activeNav?: "community" | "gallery";
+};
+
+export default function HomeHeader({ activeNav }: HomeHeaderProps) {
   const router = useRouter();
   const profileMenuRef = useRef<HTMLDivElement>(null);
   const [authOpen, setAuthOpen] = useState(false);
@@ -113,7 +118,7 @@ export default function HomeHeader() {
                 <Link
                   key={item.label}
                   href={item.href}
-                  className={`${styles.navLink} ${index === 0 ? styles.navLinkActive : ""}`}
+                  className={`${styles.navLink} ${(activeNav ? item.key === activeNav : index === 0) ? styles.navLinkActive : ""}`}
                 >
                   {item.label}
                 </Link>

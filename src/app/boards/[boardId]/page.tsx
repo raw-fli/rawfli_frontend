@@ -104,7 +104,7 @@ export default async function BoardPage({
 
     return (
       <div className={styles.page}>
-        <HomeHeader />
+        <HomeHeader activeNav="gallery" />
 
         <main className={styles.main}>
           <div className={styles.grid}>
@@ -168,7 +168,7 @@ export default async function BoardPage({
 
   return (
     <div className={styles.page}>
-      <HomeHeader />
+      <HomeHeader activeNav="community" />
 
       <main className={styles.main}>
         <div className={styles.grid}>
