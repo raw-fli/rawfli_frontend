@@ -25,7 +25,7 @@ export default function PostTable({ boardId, posts }: PostTableProps) {
           posts.map((post) => (
             <Link
               key={post.id}
-              href={`/boards/${boardId}/posts/${post.id}`}
+              href={`/posts/${post.id}`}
               className={styles.tableRow}
             >
               <div className={styles.tableId}>{post.id}</div>

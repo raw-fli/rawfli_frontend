@@ -5,7 +5,6 @@ import { toS3ImageUrl } from "@/shared/utils/image";
 import styles from "./BoardPage.module.css";
 
 type GalleryPostGridProps = {
-  boardId: number;
   boardName: string;
   posts: PostListItemResponseDto[];
 };
@@ -37,7 +36,7 @@ function getAuthorProfileImageUrl(post: PostListItemResponseDto) {
   return toS3ImageUrl(profileImageKey);
 }
 
-export default function GalleryPostGrid({ boardId, boardName, posts }: GalleryPostGridProps) {
+export default function GalleryPostGrid({ boardName, posts }: GalleryPostGridProps) {
   return (
     <section className={styles.gallerySection}>
       <div className={styles.galleryHero}>
@@ -59,7 +58,7 @@ export default function GalleryPostGrid({ boardId, boardName, posts }: GalleryPo
             return (
             <Link
               key={post.id}
-              href={`/boards/${boardId}/posts/${post.id}`}
+              href={`/posts/${post.id}`}
               className={styles.galleryCard}
             >
               <div className={styles.galleryThumb}>

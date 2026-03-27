@@ -18,8 +18,8 @@ type NavItem = {
 };
 
 const navItems: NavItem[] = [
-  { key: "community", label: "커뮤니티", href: "#" },
-  { key: "gallery", label: "갤러리", href: "#" },
+  { key: "community", label: "커뮤니티", href: "/" },
+  { key: "gallery", label: "갤러리", href: "/posts" },
   { key: "gear", label: "장비", href: "#" },
 ];
 

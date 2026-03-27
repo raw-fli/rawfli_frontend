@@ -26,7 +26,7 @@ export default function GallerySection({ board, posts, index }: GallerySectionPr
 
       <div className={styles.sectionBody}>
         {posts.slice(0, 5).map((post) => (
-          <Link key={post.id} href={`/boards/${board.id}/posts/${post.id}`} className={styles.listRow}>
+          <Link key={post.id} href={`/posts/${post.id}`} className={styles.listRow}>
             <span className={styles.listIndex}>{post.id}</span>
             <span className={styles.listTitleWrap}>
               <span className={styles.listTitle}>{post.title}</span>

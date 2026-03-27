@@ -70,7 +70,7 @@ export default function SearchBar() {
 
   const getDetailLink = (result: SearchResultItemResponseDto) =>
     result.type === "post"
-      ? `/boards/${result.boardId}/posts/${result.id}`
+      ? `/posts/${result.id}`
       : `/boards/${result.boardId}/articles/${result.id}`;
 
   return (
