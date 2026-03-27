@@ -23,6 +23,7 @@ import type { MeResponseDto } from "@rawfli/types";
 import { useQueryClient } from "@tanstack/react-query";
 import { isLoggedIn, removeToken } from "@/lib/auth";
 import { toS3ImageUrl } from "@/shared/utils/image";
+import { extractUploadedImageKeys } from "@/shared/utils/upload";
 
 const BIO_MAX_LENGTH = 300;
 
@@ -120,9 +121,9 @@ export default function SettingsPage() {
 
       if (pendingFile) {
         const uploadResult = await awsControllerUploadFile({ images: [pendingFile] });
-        const imgs = (uploadResult as unknown as { data: { key: string }[] }).data;
-        if (imgs.length > 0) {
-          finalImageKey = imgs[0].key;
+        const uploadedKeys = extractUploadedImageKeys(uploadResult);
+        if (uploadedKeys.length > 0) {
+          finalImageKey = uploadedKeys[0];
         }
       }
 

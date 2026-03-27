@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import type { ComponentPropsWithoutRef } from "react";
 import ReactMarkdown from "react-markdown";
 import { ApiError } from "@/lib/api";
 import { isLoggedIn } from "@/lib/auth";
@@ -50,7 +51,7 @@ export default function ArticleBody({ article, imageUrls, boardId, articleId }: 
         <div className={styles.content}>
           <ReactMarkdown
             components={{
-              img: ({ src }: any) => {
+              img: ({ src }: ComponentPropsWithoutRef<"img">) => {
                 const url = imageIdMap[src] ?? src;
                 if (!url) return null;
                 return (

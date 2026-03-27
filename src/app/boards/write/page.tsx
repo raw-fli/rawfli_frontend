@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import type { ComponentPropsWithoutRef } from "react";
 import { useRouter } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import {
@@ -24,9 +25,9 @@ import {
   BoardResponseDto,
   CreateArticleDto,
   awsControllerUploadFile,
-  Image as UploadedImage,
 } from "@rawfli/types";
 import { isLoggedIn } from "@/lib/auth";
+import { extractUploadedImageIds } from "@/shared/utils/upload";
 import styles from "./page.module.css";
 
 export default function ArticleWritePage() {
@@ -116,10 +117,12 @@ export default function ArticleWritePage() {
     if (usedEntries.length > 0) {
       try {
         const result = await awsControllerUploadFile({ images: usedEntries.map(([, v]) => v.file) });
-        const uploaded = (result as unknown as { data: UploadedImage[] }).data;
-        uploaded.forEach((img, i) => {
-          finalContent = finalContent.replaceAll(`![](${usedEntries[i][0]})`, `![](${img.id})`);
-          imageIds.push(img.id);
+        const uploadedIds = extractUploadedImageIds(result);
+        uploadedIds.forEach((uploadedId, i) => {
+          const tempId = usedEntries[i]?.[0];
+          if (!tempId) return;
+          finalContent = finalContent.replaceAll(`![](${tempId})`, `![](${uploadedId})`);
+          imageIds.push(uploadedId);
         });
       } catch {
         setSubmitError("이미지 업로드에 실패했습니다. 다시 시도해주세요.");
@@ -256,7 +259,7 @@ export default function ArticleWritePage() {
                   {content.trim() ? (
                     <ReactMarkdown
                       components={{
-                        img: ({ src }: any) => {
+                        img: ({ src }: ComponentPropsWithoutRef<"img">) => {
                           const url = imageMap[src]?.previewUrl;
                           if (!url) return null;
                           return <img src={url} alt="" style={{ maxWidth: "100%", borderRadius: "10px", margin: "8px 0", display: "block" }} />;

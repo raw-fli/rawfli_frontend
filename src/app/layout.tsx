@@ -3,11 +3,9 @@ import "./globals.css";
 import AppTheme from "@/components/theme/AppTheme";
 import QueryProvider from "@/components/providers/QueryProvider";
 import { Plus_Jakarta_Sans } from "next/font/google";
-import { configureApiClient } from "@rawfli/types";
+import { ensureApiClientConfigured } from "@/lib/configure-api-client";
 
-configureApiClient({
-  baseURL: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000",
-});
+ensureApiClientConfigured();
 
 const plusJakarta = Plus_Jakarta_Sans({ subsets: ["latin"] });
 

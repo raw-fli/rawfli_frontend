@@ -2,16 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  CameraIcon,
-  CheckIcon,
-  Cross2Icon,
-  MagnifyingGlassIcon,
-  Pencil2Icon,
-  PlusIcon,
-  ReloadIcon,
-  UploadIcon,
-} from "@radix-ui/react-icons";
+import { ReloadIcon, UploadIcon } from "@radix-ui/react-icons";
 import {
   awsControllerGetMyImages,
   awsControllerUploadFile,
@@ -23,102 +14,16 @@ import {
 import AuthModal from "@/components/auth/AuthModal";
 import HomeFooter from "@/components/home/HomeFooter";
 import HomeHeader from "@/components/home/HomeHeader";
+import PostWriteEditModal from "@/components/post/write/PostWriteEditModal";
+import PostWritePhotoGrid from "@/components/post/write/PostWritePhotoGrid";
+import { PhotoDraft, WriteTab } from "@/components/post/write/post-write.types";
+import { createDraft, extractMyImages, parseOptionalNumber } from "@/components/post/write/post-write.utils";
 import { getApiErrorMessage } from "@/lib/api";
 import { isLoggedIn } from "@/lib/auth";
-import { toS3ImageUrl } from "@/shared/utils/image";
+import { extractUploadedImageIds } from "@/shared/utils/upload";
 import styles from "./page.module.css";
 
-type WriteTab = "selected" | "library";
-
-type PhotoDraft = {
-  description: string;
-  cameraBrand: string;
-  cameraModel: string;
-  lensBrand: string;
-  lensModel: string;
-  iso: string;
-  shutterSpeed: string;
-  aperture: string;
-  focalLength: string;
-};
-
 const LEAVE_WARNING_MESSAGE = "임시저장이 없어 작성 중인 내용이 사라질 수 있습니다. 페이지를 나가시겠습니까?";
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
-}
-
-function toNumericString(value?: number | null): string {
-  if (value === undefined || value === null) return "";
-  return String(value);
-}
-
-function parseOptionalNumber(value: string): number | undefined {
-  const trimmed = value.trim();
-  if (!trimmed) return undefined;
-
-  const parsed = Number(trimmed);
-  if (!Number.isFinite(parsed) || parsed < 0) return undefined;
-  return parsed;
-}
-
-function createDraft(image: MyImageItemResponseDto): PhotoDraft {
-  return {
-    description: "",
-    cameraBrand: image.cameraMake ?? "",
-    cameraModel: image.cameraModel ?? "",
-    lensBrand: image.lensMake ?? "",
-    lensModel: image.lensModel ?? "",
-    iso: toNumericString(image.iso),
-    shutterSpeed: image.shutterSpeedDisplay ?? "",
-    aperture: toNumericString(image.aperture),
-    focalLength: toNumericString(image.focalLength),
-  };
-}
-
-function extractMyImages(payload: unknown): MyImageItemResponseDto[] {
-  if (!isRecord(payload)) return [];
-  const maybeData = payload.data;
-  if (!isRecord(maybeData)) return [];
-  const maybeImages = maybeData.images;
-  if (!Array.isArray(maybeImages)) return [];
-  return maybeImages.filter(
-    (item): item is MyImageItemResponseDto =>
-      isRecord(item) && typeof item.id === "string" && typeof item.key === "string",
-  );
-}
-
-function extractUploadedImageIds(payload: unknown): string[] {
-  const ids: string[] = [];
-
-  const collectFromArray = (arr: unknown[]) => {
-    for (const item of arr) {
-      if (!isRecord(item)) continue;
-      if (typeof item.id === "string") ids.push(item.id);
-    }
-  };
-
-  if (Array.isArray(payload)) {
-    collectFromArray(payload);
-    return ids;
-  }
-
-  if (!isRecord(payload)) {
-    return ids;
-  }
-
-  const maybeData = payload.data;
-  if (Array.isArray(maybeData)) {
-    collectFromArray(maybeData);
-    return ids;
-  }
-
-  if (isRecord(maybeData) && Array.isArray(maybeData.data)) {
-    collectFromArray(maybeData.data);
-  }
-
-  return ids;
-}
 
 export default function PostWritePage() {
   const router = useRouter();
@@ -245,7 +150,10 @@ export default function PostWritePage() {
   const updateDraftField = (imageId: string, field: keyof PhotoDraft, value: string) => {
     setIsDirty(true);
     setDrafts((prev) => {
-      const current = prev[imageId] ?? createDraft(imageById.get(imageId) as MyImageItemResponseDto);
+      const fallbackImage = imageById.get(imageId);
+      const current = prev[imageId] ?? (fallbackImage ? createDraft(fallbackImage) : undefined);
+      if (!current) return prev;
+
       return {
         ...prev,
         [imageId]: {
@@ -501,105 +409,15 @@ export default function PostWritePage() {
             {submitError ? <p className={styles.errorText}>{submitError}</p> : null}
 
             <div className={styles.gridWrap}>
-              {loadingImages ? (
-                <div className={styles.emptyState}>작품 목록을 불러오는 중입니다...</div>
-              ) : activeTab === "selected" ? (
-                selectedImages.length > 0 ? (
-                  <div className={styles.photoGrid}>
-                    {selectedImages.map((image) => {
-                      const imageUrl = toS3ImageUrl(image.key);
-                      const isSelected = selectedImageIds.includes(image.id);
-
-                      return (
-                        <div
-                          key={image.id}
-                          className={styles.photoCard}
-                          role="button"
-                          tabIndex={0}
-                          onClick={() => openEditor(image)}
-                          onKeyDown={(event) => {
-                            if (event.key === "Enter" || event.key === " ") {
-                              event.preventDefault();
-                              openEditor(image);
-                            }
-                          }}
-                        >
-                          {imageUrl ? (
-                            <img src={imageUrl} alt={image.key} className={styles.photoImage} />
-                          ) : (
-                            <div className={styles.photoEmpty}>No Image</div>
-                          )}
-
-                          <span className={styles.photoMeta}>ID {image.id.slice(0, 8)}</span>
-
-                          <button
-                            type="button"
-                            className={`${styles.selectMark} ${isSelected ? styles.selectMarkActive : ""}`}
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              toggleSelect(image);
-                            }}
-                            aria-label="선택 토글"
-                          >
-                            {isSelected ? <CheckIcon /> : <PlusIcon />}
-                          </button>
-
-                          <span className={styles.editMark}>
-                            <Pencil2Icon />
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <div className={styles.emptyState}>선택된 작품이 없습니다. 작품 추가 탭에서 작품을 선택하세요.</div>
-                )
-              ) : images.length > 0 ? (
-                <div className={styles.photoGrid}>
-                  {images.map((image) => {
-                    const imageUrl = toS3ImageUrl(image.key);
-                    const isSelected = selectedImageIds.includes(image.id);
-
-                    return (
-                      <div
-                        key={image.id}
-                        className={styles.photoCard}
-                        role="button"
-                        tabIndex={0}
-                        onClick={() => openEditor(image)}
-                        onKeyDown={(event) => {
-                          if (event.key === "Enter" || event.key === " ") {
-                            event.preventDefault();
-                            openEditor(image);
-                          }
-                        }}
-                      >
-                        {imageUrl ? (
-                          <img src={imageUrl} alt={image.key} className={styles.photoImage} />
-                        ) : (
-                          <div className={styles.photoEmpty}>No Image</div>
-                        )}
-
-                        <span className={styles.photoMeta}>{image.usedInPhotoCount > 0 ? `사용 ${image.usedInPhotoCount}회` : "미사용"}</span>
-
-                        <button
-                          type="button"
-                          className={`${styles.selectMark} ${isSelected ? styles.selectMarkActive : ""}`}
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            toggleSelect(image);
-                          }}
-                          aria-label="선택 토글"
-                        >
-                          {isSelected ? <CheckIcon /> : <PlusIcon />}
-                        </button>
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className={styles.emptyState}>업로드된 이미지가 없습니다. 먼저 이미지를 업로드해 주세요.</div>
-              )}
+              <PostWritePhotoGrid
+                activeTab={activeTab}
+                loadingImages={loadingImages}
+                images={images}
+                selectedImages={selectedImages}
+                selectedImageIds={selectedImageIds}
+                onOpenEditor={openEditor}
+                onToggleSelect={toggleSelect}
+              />
             </div>
           </section>
         </div>
@@ -607,152 +425,14 @@ export default function PostWritePage() {
 
       <HomeFooter />
 
-      {editingImage && editingDraft && (
-        <div className={styles.modalOverlay} onClick={() => setEditingImageId(null)}>
-          <div className={styles.modalRoot} onClick={(event) => event.stopPropagation()}>
-            <button
-              type="button"
-              className={styles.modalClose}
-              onClick={() => setEditingImageId(null)}
-            >
-              <Cross2Icon />
-            </button>
-
-            <div className={styles.modalPreview}>
-              {toS3ImageUrl(editingImage.key) ? (
-                <img
-                  src={toS3ImageUrl(editingImage.key)}
-                  alt={editingImage.key}
-                  className={styles.modalPreviewImage}
-                />
-              ) : (
-                <div className={styles.modalPreviewEmpty}>이미지 미리보기가 없습니다.</div>
-              )}
-            </div>
-
-            <div className={styles.modalForm}>
-              <div className={styles.modalHead}>
-                <span className={styles.modalHeadLabel}>메타데이터 편집</span>
-                <h3 className={styles.modalTitle}>작품 상세 정보</h3>
-              </div>
-
-              <button
-                type="button"
-                className={`${styles.attachButton} ${selectedImageIds.includes(editingImage.id) ? styles.attachButtonActive : ""}`}
-                onClick={() => toggleSelect(editingImage)}
-              >
-                {selectedImageIds.includes(editingImage.id) ? "포스트에 포함됨" : "포스트에 추가"}
-              </button>
-
-              <div className={styles.modalFieldGrid}>
-                <label className={styles.modalFieldLabel}>작품 설명</label>
-                <textarea
-                  className={styles.modalTextArea}
-                  value={editingDraft.description}
-                  onChange={(event) => updateDraftField(editingImage.id, "description", event.target.value)}
-                  rows={3}
-                />
-              </div>
-
-              <div className={styles.metaGridTwo}>
-                <div className={styles.modalFieldGrid}>
-                  <label className={styles.modalFieldLabel}>Camera Body</label>
-                  <div className={styles.inputWithIcon}>
-                    <CameraIcon className={styles.inputIcon} />
-                    <input
-                      className={styles.modalInput}
-                      value={editingDraft.cameraModel}
-                      onChange={(event) => updateDraftField(editingImage.id, "cameraModel", event.target.value)}
-                      placeholder="모델명"
-                    />
-                  </div>
-                  <input
-                    className={styles.modalInput}
-                    value={editingDraft.cameraBrand}
-                    onChange={(event) => updateDraftField(editingImage.id, "cameraBrand", event.target.value)}
-                    placeholder="브랜드"
-                  />
-                </div>
-
-                <div className={styles.modalFieldGrid}>
-                  <label className={styles.modalFieldLabel}>Lens Model</label>
-                  <div className={styles.inputWithIcon}>
-                    <MagnifyingGlassIcon className={styles.inputIcon} />
-                    <input
-                      className={styles.modalInput}
-                      value={editingDraft.lensModel}
-                      onChange={(event) => updateDraftField(editingImage.id, "lensModel", event.target.value)}
-                      placeholder="모델명"
-                    />
-                  </div>
-                  <input
-                    className={styles.modalInput}
-                    value={editingDraft.lensBrand}
-                    onChange={(event) => updateDraftField(editingImage.id, "lensBrand", event.target.value)}
-                    placeholder="브랜드"
-                  />
-                </div>
-              </div>
-
-              <div className={styles.metaGridFour}>
-                <div className={styles.modalFieldGrid}>
-                  <label className={styles.modalFieldLabel}>ISO</label>
-                  <input
-                    className={styles.modalInput}
-                    value={editingDraft.iso}
-                    onChange={(event) => updateDraftField(editingImage.id, "iso", event.target.value)}
-                    placeholder="3200"
-                  />
-                </div>
-                <div className={styles.modalFieldGrid}>
-                  <label className={styles.modalFieldLabel}>Shutter</label>
-                  <input
-                    className={styles.modalInput}
-                    value={editingDraft.shutterSpeed}
-                    onChange={(event) => updateDraftField(editingImage.id, "shutterSpeed", event.target.value)}
-                    placeholder="1/125"
-                  />
-                </div>
-                <div className={styles.modalFieldGrid}>
-                  <label className={styles.modalFieldLabel}>Aperture</label>
-                  <input
-                    className={styles.modalInput}
-                    value={editingDraft.aperture}
-                    onChange={(event) => updateDraftField(editingImage.id, "aperture", event.target.value)}
-                    placeholder="2.8"
-                  />
-                </div>
-                <div className={styles.modalFieldGrid}>
-                  <label className={styles.modalFieldLabel}>Focal Length</label>
-                  <input
-                    className={styles.modalInput}
-                    value={editingDraft.focalLength}
-                    onChange={(event) => updateDraftField(editingImage.id, "focalLength", event.target.value)}
-                    placeholder="24"
-                  />
-                </div>
-              </div>
-
-              <div className={styles.modalActions}>
-                <button
-                  type="button"
-                  className={styles.modalSecondaryButton}
-                  onClick={() => setEditingImageId(null)}
-                >
-                  닫기
-                </button>
-                <button
-                  type="button"
-                  className={styles.modalPrimaryButton}
-                  onClick={() => setEditingImageId(null)}
-                >
-                  저장
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <PostWriteEditModal
+        editingImage={editingImage}
+        editingDraft={editingDraft}
+        selectedImageIds={selectedImageIds}
+        onClose={() => setEditingImageId(null)}
+        onToggleSelect={toggleSelect}
+        onUpdateDraftField={updateDraftField}
+      />
     </div>
   );
 }

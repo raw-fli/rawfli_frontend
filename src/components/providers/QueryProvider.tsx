@@ -2,13 +2,9 @@
 
 import { useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { configureApiClient } from "@rawfli/types";
-import { getApiToken } from "@/lib/api";
+import { ensureApiClientConfigured } from "@/lib/configure-api-client";
 
-configureApiClient({
-  baseURL: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000",
-  getToken: getApiToken,
-});
+ensureApiClientConfigured();
 
 export default function QueryProvider({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
