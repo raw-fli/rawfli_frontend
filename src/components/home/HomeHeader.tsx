@@ -12,19 +12,19 @@ import { useMeControllerGetMe } from "@rawfli/types";
 import { toS3ImageUrl } from "@/shared/utils/image";
 
 type NavItem = {
-  key: "community" | "gallery" | "gear";
+  key: "community" | "posts" | "gear";
   label: string;
   href: string;
 };
 
 const navItems: NavItem[] = [
   { key: "community", label: "커뮤니티", href: "/" },
-  { key: "gallery", label: "갤러리", href: "/posts" },
+  { key: "posts", label: "포스트", href: "/posts" },
   { key: "gear", label: "장비", href: "#" },
 ];
 
 type HomeHeaderProps = {
-  activeNav?: "community" | "gallery";
+  activeNav?: "community" | "posts";
 };
 
 export default function HomeHeader({ activeNav }: HomeHeaderProps) {

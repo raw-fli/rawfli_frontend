@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Pencil2Icon, ReaderIcon } from "@radix-ui/react-icons";
+import { ImageIcon, Pencil2Icon, ReaderIcon } from "@radix-ui/react-icons";
 import styles from "./HomePage.module.css";
 import { BoardResponseDto } from "@rawfli/types";
 
@@ -31,6 +31,17 @@ export default function Sidebar({ boards }: SidebarProps) {
               {index === 0 && <span className={styles.hotBadge}>HOT</span>}
             </Link>
           ))}
+        </div>
+      </div>
+
+      <div className={`${styles.sidebarCard} ${styles.sidebarPopularCard}`}>
+        <h3 className={styles.sidebarTitle}>
+          <ImageIcon /> 포스트
+        </h3>
+        <div className={styles.sidebarList}>
+          <Link href="/posts" className={styles.sidebarItem}>
+            <span>인기 포스트</span>
+          </Link>
         </div>
       </div>
     </aside>

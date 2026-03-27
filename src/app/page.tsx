@@ -1,6 +1,7 @@
 import HomeHeader from "@/components/home/HomeHeader";
 import Sidebar from "@/components/home/Sidebar";
 import CommunitySection from "@/components/home/CommunitySection";
+import PostSection from "@/components/home/PostSection";
 import HomeFooter from "@/components/home/HomeFooter";
 import styles from "@/components/home/HomePage.module.css";
 import "@/lib/server-api";
@@ -12,6 +13,8 @@ import {
   ArticleListResponseDto,
   BoardResponseDto,
   boardsControllerGetBoards,
+  PostListItemResponseDto,
+  postsControllerGetPopularPosts,
 } from "@rawfli/types";
 
 type BoardFeed = {
@@ -79,7 +82,12 @@ async function loadBoardFeeds(): Promise<BoardFeed[]> {
 }
 
 export default async function Home() {
-  const feeds = await loadBoardFeeds();
+  const [feeds, popularPostsResp] = await Promise.all([
+    loadBoardFeeds(),
+    postsControllerGetPopularPosts({ page: 1, limit: 3 }),
+  ]);
+
+  const popularPosts: PostListItemResponseDto[] = popularPostsResp?.data?.posts ?? [];
 
   return (
     <div className={styles.page}>
@@ -98,6 +106,8 @@ export default async function Home() {
                 index={index}
               />
             ))}
+
+            <PostSection posts={popularPosts} index={feeds.length} />
           </div>
         </div>
       </main>
