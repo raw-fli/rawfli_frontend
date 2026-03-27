@@ -1,0 +1,598 @@
+.page {
+  min-height: 100vh;
+  background:
+    radial-gradient(1200px 420px at 15% -10%, rgba(50, 255, 0, 0.12), transparent 60%),
+    radial-gradient(900px 360px at 85% 5%, rgba(50, 255, 0, 0.06), transparent 60%),
+    var(--bg-main);
+  color: var(--text-primary);
+}
+
+.main {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.actionBar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.ghostButton {
+  height: 38px;
+  padding: 0 16px;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ghostButton:hover {
+  background: var(--input-bg);
+  color: var(--text-primary);
+}
+
+.publishButton {
+  height: 38px;
+  padding: 0 18px;
+  border: none;
+  border-radius: 10px;
+  background: var(--color-accent);
+  color: var(--text-on-accent);
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 8px 22px rgba(50, 255, 0, 0.15);
+}
+
+.publishButton:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.workspace {
+  height: calc(100vh - 156px);
+  min-height: 620px;
+  display: flex;
+  gap: 18px;
+}
+
+.sidePanel {
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.sideCard {
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  padding: 18px;
+}
+
+.sideTitle {
+  margin: 0 0 14px;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.sideSubTitle {
+  margin: 0 0 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.statLine {
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.fieldGroup {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.fieldLabel {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  font-weight: 700;
+}
+
+.textInput,
+.textArea {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  background: var(--input-bg);
+  color: var(--text-primary);
+  box-sizing: border-box;
+}
+
+.textInput {
+  height: 40px;
+  padding: 0 12px;
+}
+
+.textArea {
+  min-height: 120px;
+  padding: 10px 12px;
+  resize: vertical;
+}
+
+.textInput:focus,
+.textArea:focus,
+.modalInput:focus,
+.modalTextArea:focus {
+  outline: none;
+  border-color: color-mix(in oklab, var(--color-accent), white 10%);
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--color-accent), transparent 85%);
+}
+
+.contentPanel {
+  flex: 1;
+  border-radius: 18px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.panelHead {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0 18px;
+  min-height: 66px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.panelTitle {
+  font-size: 20px;
+  font-weight: 800;
+  margin: 0;
+}
+
+.tabRow {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+}
+
+.tabButton {
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 0 10px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
+
+.tabButtonActive {
+  color: var(--color-accent);
+  border-bottom-color: var(--color-accent);
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border-color);
+  background: color-mix(in oklab, var(--bg-main), var(--bg-card) 35%);
+}
+
+.toolbarButton,
+.toolbarButtonSecondary {
+  height: 34px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.toolbarButton {
+  border: 1px solid var(--border-color);
+  background: var(--input-bg);
+  color: var(--text-primary);
+}
+
+.toolbarButtonSecondary {
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.toolbarHint {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.gridWrap {
+  flex: 1;
+  overflow-y: auto;
+  padding: 18px;
+}
+
+.photoGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.photoCard {
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background: var(--input-bg);
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  text-align: left;
+}
+
+.photoCard:hover {
+  border-color: var(--color-accent);
+}
+
+.photoImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photoEmpty {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.photoMeta {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  border-radius: 999px;
+  padding: 2px 8px;
+  background: rgba(0, 0, 0, 0.62);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.selectMark {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.selectMarkActive {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--text-on-accent);
+}
+
+.editMark {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.42);
+  color: #fff;
+  display: grid;
+  place-items: center;
+}
+
+.emptyState {
+  border: 1px dashed var(--border-color);
+  border-radius: 14px;
+  padding: 32px;
+  color: var(--text-secondary);
+  text-align: center;
+  font-size: 14px;
+}
+
+.errorText {
+  margin: 10px 18px 0;
+  color: #ff7474;
+  font-size: 13px;
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.modalRoot {
+  width: min(1240px, 100%);
+  height: min(860px, 92vh);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--bg-main);
+  overflow: hidden;
+  display: flex;
+  position: relative;
+}
+
+.modalClose {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 5;
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.4);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.modalPreview {
+  flex: 1.45;
+  background: #090909;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+}
+
+.modalPreviewImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.modalPreviewEmpty {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.modalForm {
+  flex: 1;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 24px;
+  overflow-y: auto;
+  display: grid;
+  gap: 18px;
+}
+
+.modalHeadLabel {
+  display: block;
+  color: var(--color-accent);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.modalTitle {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 800;
+}
+
+.attachButton {
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  background: var(--input-bg);
+  color: var(--text-primary);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.attachButtonActive {
+  border-color: var(--color-accent);
+  background: color-mix(in oklab, var(--color-accent), transparent 88%);
+  color: var(--color-accent);
+}
+
+.modalFieldGrid {
+  display: grid;
+  gap: 8px;
+}
+
+.modalFieldLabel {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  font-weight: 700;
+}
+
+.modalInput,
+.modalTextArea {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: color-mix(in oklab, var(--bg-card), #000 14%);
+  color: var(--text-primary);
+  box-sizing: border-box;
+}
+
+.modalInput {
+  height: 40px;
+  padding: 0 12px;
+}
+
+.modalTextArea {
+  min-height: 90px;
+  padding: 10px 12px;
+  resize: vertical;
+}
+
+.metaGridTwo {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.metaGridFour {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.inputWithIcon {
+  position: relative;
+}
+
+.inputIcon {
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+}
+
+.inputWithIcon .modalInput {
+  padding-left: 36px;
+}
+
+.modalActions {
+  margin-top: auto;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.modalSecondaryButton,
+.modalPrimaryButton {
+  height: 38px;
+  padding: 0 18px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.modalSecondaryButton {
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.modalPrimaryButton {
+  border: none;
+  background: var(--color-accent);
+  color: var(--text-on-accent);
+}
+
+@media (max-width: 1320px) {
+  .photoGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 1024px) {
+  .workspace {
+    height: auto;
+    min-height: 0;
+    flex-direction: column;
+  }
+
+  .sidePanel {
+    width: 100%;
+    overflow: visible;
+    padding-right: 0;
+  }
+
+  .contentPanel {
+    min-height: 640px;
+  }
+
+  .modalRoot {
+    flex-direction: column;
+    height: min(900px, 94vh);
+  }
+
+  .modalPreview {
+    min-height: 280px;
+    flex: none;
+  }
+
+  .modalForm {
+    border-left: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+}
+
+@media (max-width: 768px) {
+  .main {
+    padding: 16px;
+  }
+
+  .panelHead {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 14px;
+  }
+
+  .toolbar {
+    flex-wrap: wrap;
+    padding: 12px 14px;
+  }
+
+  .toolbarHint {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .gridWrap {
+    padding: 14px;
+  }
+
+  .photoGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .metaGridTwo,
+  .metaGridFour {
+    grid-template-columns: 1fr;
+  }
+}
