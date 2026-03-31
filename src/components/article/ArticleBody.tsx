@@ -52,6 +52,7 @@ export default function ArticleBody({ article, imageUrls, boardId, articleId }: 
           <ReactMarkdown
             components={{
               img: ({ src }: ComponentPropsWithoutRef<"img">) => {
+                if (!src || typeof src !== "string") return null;
                 const url = imageIdMap[src] ?? src;
                 if (!url) return null;
                 return (
