@@ -51,7 +51,6 @@ export default function AdminDeletedPostsPage() {
         <thead>
           <tr>
             <th>ID</th>
-            <th>Board</th>
             <th>Author</th>
             <th>제목</th>
             <th>본문</th>
@@ -62,7 +61,6 @@ export default function AdminDeletedPostsPage() {
           {items.map((post) => (
             <tr key={post.id}>
               <td>{post.originalPostId}</td>
-              <td>{post.boardId}</td>
               <td>{post.authorId}</td>
               <td>{post.title}</td>
               <td className={styles.contentCell}>{post.content}</td>
