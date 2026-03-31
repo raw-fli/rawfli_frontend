@@ -17,6 +17,8 @@ import {
   postsControllerGetPopularPosts,
 } from "@rawfli/types";
 
+export const dynamic = "force-dynamic";
+
 type BoardFeed = {
   board: BoardResponseDto;
   articles?: ArticleListResponseDto["articles"] | ArticleListItemResponseDto[];
