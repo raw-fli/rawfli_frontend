@@ -260,7 +260,7 @@ export default function ArticleWritePage() {
                     <ReactMarkdown
                       components={{
                         img: ({ src }: ComponentPropsWithoutRef<"img">) => {
-                          const url = imageMap[src]?.previewUrl;
+                          const url = imageMap[src as string]?.previewUrl;
                           if (!url) return null;
                           return <img src={url} alt="" style={{ maxWidth: "100%", borderRadius: "10px", margin: "8px 0", display: "block" }} />;
                         },
