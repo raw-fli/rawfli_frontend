@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { ReloadIcon, UploadIcon } from "@radix-ui/react-icons";
 import {
   awsControllerGetMyImages,
-  awsControllerUploadFile,
   CreatePostDto,
   CreatePostPhotoDto,
   MyImageItemResponseDto,
@@ -20,7 +19,7 @@ import { PhotoDraft, WriteTab } from "@/components/post/write/post-write.types";
 import { createDraft, extractMyImages, parseOptionalNumber } from "@/components/post/write/post-write.utils";
 import { getApiErrorMessage } from "@/lib/api";
 import { isLoggedIn } from "@/lib/auth";
-import { extractUploadedImageIds } from "@/shared/utils/upload";
+import { SUPPORTED_UPLOAD_IMAGE_MIME_TYPES, uploadImagesWithPresignedUrls } from "@/shared/utils/upload";
 import styles from "./page.module.css";
 
 const LEAVE_WARNING_MESSAGE = "임시저장이 없어 작성 중인 내용이 사라질 수 있습니다. 페이지를 나가시겠습니까?";
@@ -173,11 +172,11 @@ export default function PostWritePage() {
     if (!files || files.length === 0) return;
 
     const validFiles = Array.from(files).filter((file) =>
-      ["image/jpeg", "image/png", "image/webp"].includes(file.type),
+      SUPPORTED_UPLOAD_IMAGE_MIME_TYPES.includes(file.type as (typeof SUPPORTED_UPLOAD_IMAGE_MIME_TYPES)[number]),
     );
 
     if (validFiles.length === 0) {
-      setSubmitError("jpg, png, webp 파일만 업로드할 수 있습니다.");
+      setSubmitError("지원되는 이미지 파일만 업로드할 수 있습니다.");
       return;
     }
 
@@ -185,8 +184,8 @@ export default function PostWritePage() {
     setSubmitError(null);
 
     try {
-      const uploadResponse = await awsControllerUploadFile({ images: validFiles });
-      const uploadedIds = extractUploadedImageIds(uploadResponse);
+      const uploaded = await uploadImagesWithPresignedUrls(validFiles);
+      const uploadedIds = uploaded.map((item) => item.imageId);
 
       const refreshed = await loadMyImages(true);
       const refreshedMap = new Map(refreshed.map((image) => [image.id, image]));

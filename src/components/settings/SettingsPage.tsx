@@ -16,14 +16,13 @@ import {
   useMeControllerGetMe,
   useMeControllerUpdateProfile,
   useMeControllerUpdatePassword,
-  awsControllerUploadFile,
   getMeControllerGetMeQueryKey,
 } from "@rawfli/types";
 import type { MeResponseDto } from "@rawfli/types";
 import { useQueryClient } from "@tanstack/react-query";
 import { isLoggedIn, removeToken } from "@/lib/auth";
 import { toS3ImageUrl } from "@/shared/utils/image";
-import { extractUploadedImageKeys } from "@/shared/utils/upload";
+import { uploadImagesWithPresignedUrls } from "@/shared/utils/upload";
 
 const BIO_MAX_LENGTH = 300;
 
@@ -120,10 +119,9 @@ export default function SettingsPage() {
       let finalImageKey = profileImageKey;
 
       if (pendingFile) {
-        const uploadResult = await awsControllerUploadFile({ images: [pendingFile] });
-        const uploadedKeys = extractUploadedImageKeys(uploadResult);
-        if (uploadedKeys.length > 0) {
-          finalImageKey = uploadedKeys[0];
+        const uploaded = await uploadImagesWithPresignedUrls([pendingFile]);
+        if (uploaded.length > 0) {
+          finalImageKey = uploaded[0].key;
         }
       }
 

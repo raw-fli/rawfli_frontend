@@ -24,11 +24,10 @@ import {
   useArticleControllerCreateArticle,
   BoardResponseDto,
   CreateArticleDto,
-  awsControllerUploadFile,
 } from "@rawfli/types";
 import { isLoggedIn } from "@/lib/auth";
 import { toS3ImageUrl } from "@/shared/utils/image";
-import { extractUploadedImageIds } from "@/shared/utils/upload";
+import { SUPPORTED_UPLOAD_IMAGE_MIME_TYPES, uploadImagesWithPresignedUrls } from "@/shared/utils/upload";
 import styles from "./page.module.css";
 
 type ImageMapEntry = {
@@ -137,7 +136,7 @@ export default function ArticleWriteContent() {
     if (!files) return;
 
     const newFiles = Array.from(files).filter((f) =>
-      ["image/jpeg", "image/png", "image/webp"].includes(f.type)
+      SUPPORTED_UPLOAD_IMAGE_MIME_TYPES.includes(f.type as (typeof SUPPORTED_UPLOAD_IMAGE_MIME_TYPES)[number])
     );
     if (!newFiles.length) return;
 
@@ -183,14 +182,13 @@ export default function ArticleWriteContent() {
 
     if (usedEntries.length > 0) {
       try {
-        const result = await awsControllerUploadFile({
-          images: usedEntries.map(([, v]) => v.file as File),
-        });
-        const uploadedIds = extractUploadedImageIds(result);
-        uploadedIds.forEach((uploadedId, i) => {
+        const uploaded = await uploadImagesWithPresignedUrls(
+          usedEntries.map(([, v]) => v.file as File),
+        );
+        uploaded.forEach((item, i) => {
           const tempId = usedEntries[i]?.[0];
           if (!tempId) return;
-          finalContent = finalContent.replaceAll(`![](${tempId})`, `![](${uploadedId})`);
+          finalContent = finalContent.replaceAll(`![](${tempId})`, `![](${item.imageId})`);
         });
       } catch {
         setSubmitError("이미지 업로드에 실패했습니다. 다시 시도해주세요.");
