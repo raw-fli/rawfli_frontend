@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { ComponentPropsWithoutRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import {
   CameraIcon,
@@ -20,6 +20,8 @@ import HomeHeader from "@/components/home/HomeHeader";
 import HomeFooter from "@/components/home/HomeFooter";
 import AuthModal from "@/components/auth/AuthModal";
 import {
+  articleControllerEditArticle,
+  articleControllerGetArticle,
   boardsControllerGetBoards,
   useArticleControllerCreateArticle,
   BoardResponseDto,
@@ -27,11 +29,39 @@ import {
   awsControllerUploadFile,
 } from "@rawfli/types";
 import { isLoggedIn } from "@/lib/auth";
+import { toS3ImageUrl } from "@/shared/utils/image";
 import { extractUploadedImageIds } from "@/shared/utils/upload";
 import styles from "./page.module.css";
 
+type ImageMapEntry = {
+  file?: File;
+  previewUrl: string;
+};
+
+function extractMarkdownImageIds(content: string): string[] {
+  return Array.from(content.matchAll(/!\[\]\(([^)]+)\)/g), (match) => match[1]);
+}
+
+function buildImageMapFromAttachedImages(
+  images: { id: string; key: string }[]
+): Record<string, ImageMapEntry> {
+  return images.reduce<Record<string, ImageMapEntry>>((acc, image) => {
+    const previewUrl = toS3ImageUrl(image.key);
+    if (previewUrl) {
+      acc[image.id] = { previewUrl };
+    }
+    return acc;
+  }, {});
+}
+
 export default function ArticleWritePage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const boardIdParam = searchParams.get("boardId");
+  const articleIdParam = searchParams.get("articleId");
+  const editBoardId = boardIdParam ? Number(boardIdParam) : Number.NaN;
+  const editArticleId = articleIdParam ? Number(articleIdParam) : Number.NaN;
+  const isEditMode = Number.isFinite(editBoardId) && Number.isFinite(editArticleId);
 
   const [boardId, setBoardId] = useState<number | null>(null);
   const [boards, setBoards] = useState<BoardResponseDto[]>([]);
@@ -41,24 +71,56 @@ export default function ArticleWritePage() {
   const [content, setContent] = useState("");
   const [editorTab, setEditorTab] = useState<"edit" | "preview">("edit");
 
-  const [imageMap, setImageMap] = useState<Record<string, { file: File; previewUrl: string }>>({});
+  const [imageMap, setImageMap] = useState<Record<string, ImageMapEntry>>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [loadingArticle, setLoadingArticle] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const createArticle = useArticleControllerCreateArticle();
 
+  const loadCommunityBoards = () => {
+    boardsControllerGetBoards().then((res) => {
+      const communityBoards = res.data.filter((b) => b.type === "community");
+      setBoards(communityBoards);
+    });
+  };
+
+  const loadEditArticle = () => {
+    if (!Number.isFinite(editBoardId) || !Number.isFinite(editArticleId)) {
+      return;
+    }
+
+    setBoardId(editBoardId);
+    setLoadingArticle(true);
+    articleControllerGetArticle(editBoardId, editArticleId)
+      .then((res) => {
+        setTitle(res.data.title ?? "");
+        setContent(res.data.content ?? "");
+        setImageMap(buildImageMapFromAttachedImages(res.data.attachedImages ?? []));
+      })
+      .catch(() => {
+        setSubmitError("수정할 게시글을 불러오지 못했습니다.");
+      })
+      .finally(() => {
+        setLoadingArticle(false);
+      });
+  };
+
   useEffect(() => {
     if (!isLoggedIn()) {
       setAuthModalOpen(true);
       return;
     }
-    boardsControllerGetBoards().then((res) => {
-      const communityBoards = res.data.filter((b) => b.type === "community");
-      setBoards(communityBoards);
-    });
-  }, []);
+
+    if (isEditMode) {
+      loadEditArticle();
+      return;
+    }
+
+    loadCommunityBoards();
+  }, [editArticleId, editBoardId, isEditMode]);
 
 
   const insertAtCursor = (text: string) => {
@@ -94,7 +156,10 @@ export default function ArticleWritePage() {
   };
 
   const handleRemoveImage = (id: string) => {
-    URL.revokeObjectURL(imageMap[id]?.previewUrl);
+    const imageEntry = imageMap[id];
+    if (imageEntry?.file) {
+      URL.revokeObjectURL(imageEntry.previewUrl);
+    }
     setImageMap((prev) => { const next = { ...prev }; delete next[id]; return next; });
     setContent((prev) => prev.replaceAll(`\n![](${id})\n`, "").replaceAll(`![](${id})`, ""));
   };
@@ -109,20 +174,18 @@ export default function ArticleWritePage() {
     setSubmitError(null);
 
     let finalContent = content.trim();
-    const imageIds: string[] = [];
-
-
-    const usedEntries = Object.entries(imageMap).filter(([id]) => finalContent.includes(`![](${id})`));
+    const usedEntries = Object.entries(imageMap).filter(
+      ([id, info]) => info.file && finalContent.includes(`![](${id})`)
+    );
 
     if (usedEntries.length > 0) {
       try {
-        const result = await awsControllerUploadFile({ images: usedEntries.map(([, v]) => v.file) });
+        const result = await awsControllerUploadFile({ images: usedEntries.map(([, v]) => v.file as File) });
         const uploadedIds = extractUploadedImageIds(result);
         uploadedIds.forEach((uploadedId, i) => {
           const tempId = usedEntries[i]?.[0];
           if (!tempId) return;
           finalContent = finalContent.replaceAll(`![](${tempId})`, `![](${uploadedId})`);
-          imageIds.push(uploadedId);
         });
       } catch {
         setSubmitError("이미지 업로드에 실패했습니다. 다시 시도해주세요.");
@@ -130,27 +193,43 @@ export default function ArticleWritePage() {
       }
     }
 
+    const imageIds = extractMarkdownImageIds(finalContent);
     const dto: CreateArticleDto = {
       title: title.trim(),
       content: finalContent,
       imageIds,
     };
 
-    createArticle.mutate(
-      { boardId, data: dto },
-      {
-        onSuccess: (res) => {
-          const articleId = res.data.id;
-          router.push(`/boards/${boardId}/articles/${articleId}`);
-        },
-        onError: () => {
-          setSubmitError("게시글 등록에 실패했습니다. 로그인 상태를 확인해주세요.");
-        },
+    try {
+      if (isEditMode) {
+        if (!Number.isFinite(editBoardId) || !Number.isFinite(editArticleId)) {
+          setSubmitError("수정할 게시글 정보를 찾지 못했습니다.");
+          return;
+        }
+
+        await articleControllerEditArticle(editBoardId, editArticleId, dto);
+        router.push(`/boards/${editBoardId}/articles/${editArticleId}`);
+        return;
       }
-    );
+
+      createArticle.mutate(
+        { boardId, data: dto },
+        {
+          onSuccess: (res) => {
+            const articleId = res.data.id;
+            router.push(`/boards/${boardId}/articles/${articleId}`);
+          },
+          onError: () => {
+            setSubmitError("게시글 등록에 실패했습니다. 로그인 상태를 확인해주세요.");
+          },
+        }
+      );
+    } catch {
+      setSubmitError("게시글 수정에 실패했습니다. 다시 시도해주세요.");
+    }
   };
 
-  const canSubmit = !!title.trim() && !!content.trim() && !createArticle.isPending;
+  const canSubmit = !!title.trim() && !!content.trim() && !!boardId && !createArticle.isPending && !loadingArticle;
 
   return (
     <div className={styles.page}>
@@ -163,19 +242,21 @@ export default function ArticleWritePage() {
         onChangeMode={() => {}}
         onAuthSuccess={() => {
           setAuthModalOpen(false);
-          boardsControllerGetBoards().then((res) => {
-            const communityBoards = res.data.filter((b) => b.type === "community");
-            setBoards(communityBoards);
-          });
+          if (isEditMode) {
+            loadEditArticle();
+            return;
+          }
+
+          loadCommunityBoards();
         }}
       />
 
       <main className={styles.main}>
         <div className={styles.grid}>
           <div className={styles.formCard}>
-            <h2 className={styles.formTitle}>게시글 작성</h2>
+            <h2 className={styles.formTitle}>{isEditMode ? "게시글 수정" : "게시글 작성"}</h2>
 
-            {boards.length > 0 && (
+            {!isEditMode && boards.length > 0 && (
               <div className={styles.boardSelector}>
                 {boards.map((board) => (
                   <button
@@ -324,7 +405,7 @@ export default function ArticleWritePage() {
                 disabled={!canSubmit}
                 onClick={handleSubmit}
               >
-                등록하기
+                {isEditMode ? "수정하기" : "등록하기"}
               </button>
             </div>
           </div>
