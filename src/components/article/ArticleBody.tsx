@@ -57,14 +57,13 @@ export default function ArticleBody({ article, imageUrls, boardId, articleId }: 
                 if (!url) return null;
                 return (
                   <span className={styles.imageWrap}>
-                    <Image
+                    <img
                       className={styles.image}
                       src={url}
                       alt=""
-                      width={0}
-                      height={0}
-                      sizes="100vw"
-                      style={{ width: '100%', height: 'auto' }}
+                      loading="lazy"
+                      decoding="async"
+                      style={{ width: "100%", height: "auto" }}
                     />
                   </span>
                 );
